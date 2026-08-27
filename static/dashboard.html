@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>造梦者 | 系统面板</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+  /* Dashboard 强制深色背景（不受系统主题影响） */
+  body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: #e2e8f0 !important;
+    min-height: 100vh;
+  }
+  .dash-shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+  .dash-header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .dash-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .dash-tab {
+    padding: 12px 20px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 15px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .dash-tab.active {
+    color: #fff;
+    border-bottom-color: #6366f1;
+  }
+  .dash-tab:hover {
+    color: rgba(255,255,255,0.9);
+  }
+  .dash-panel { display: none; }
+  .dash-panel.active { display: block; }
+  .card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h3 {
+    font-size: 14px;
+    color: #cbd5e1;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .stat {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .stat-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: #f1f5f9;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: #cbd5e1;
+    margin-top: 4px;
+  }
+  .stat-sub {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .table th, .table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .table th {
+    color: rgba(255,255,255,0.5);
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+  .table tr:hover td {
+    background: rgba(255,255,255,0.02);
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .badge-db { background: rgba(99,102,241,0.2); color: #a5b4fc; }
+  .badge-dir { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+  .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #475569;
+    background: #334155;
+    color: #f1f5f9;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:hover {
+    background: #475569;
+  }
+  .btn-danger {
+    background: #b91c1c;
+    color: #fff;
+    border-color: #991b1b;
+  }
+  .btn-danger:hover {
+    background: #991b1b;
+  }
+  .empty {
+    text-align: center;
+    color: #94a3b8;
+    padding: 40px;
+    font-size: 14px;
+  }
+  .chart-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 768px) {
+    .chart-row { grid-template-columns: 1fr; }
+  }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+  .bar-label { width: 100px; color: rgba(255,255,255,0.7); }
+  .bar-track {
+    flex: 1;
+    height: 18px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 9px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    border-radius: 9px;
+    transition: width 0.3s;
+  }
+  .bar-value {
+    width: 80px;
+    text-align: right;
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+  }
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    background: rgba(16,185,129,0.9);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .toast.error { background: rgba(239,68,68,0.9); }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="dash-shell">
+  <div class="dash-header">
+    <h1>造梦者 · 系统面板</h1>
+    <a href="/" class="btn">返回创作</a>
+  </div>
+
+  <div class="dash-tabs">
+    <button class="dash-tab active" data-tab="usage">Token 用量</button>
+    <button class="dash-tab" data-tab="backup">数据库备份</button>
+  </div>
+
+  <div class="dash-panel active" id="panel-usage">
+    <div class="card" style="margin-bottom: 16px;">
+      <h3>查看哪本书</h3>
+      <div class="toolbar" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <label style="font-size:13px;color:rgba(255,255,255,0.7);">书籍：</label>
+        <select id="usage-novel-select" style="padding:6px 10px;border-radius:6px;background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.2);min-width:280px;font-size:13px;">
+          <option value="__all__">📚 所有书总览</option>
+        </select>
+        <span id="usage-current-label" style="font-size:12px;color:rgba(255,255,255,0.5);"></span>
+        <button class="btn" id="refresh-novel-list" style="margin-left:auto;">刷新书单</button>
+      </div>
+    </div>
+    <div class="stat-row" id="usage-stats">
+      <div class="empty">加载中...</div>
+    </div>
+    <div class="chart-row">
+      <div class="card">
+        <h3>按角色消耗</h3>
+        <div id="by-role-chart"></div>
+      </div>
+      <div class="card">
+        <h3>按 Provider 消耗</h3>
+        <div id="by-provider-chart"></div>
+      </div>
+    </div>
+    <div class="card" id="all-novels-card" style="display:none;">
+      <h3>各书累计对比</h3>
+      <div id="all-novels-list"></div>
+    </div>
+    <div class="card">
+      <h3>操作</h3>
+      <div class="toolbar">
+        <button class="btn" id="refresh-usage">刷新数据</button>
+        <button class="btn btn-danger" id="reset-usage">重置统计</button>
+        <button class="btn" id="backfill-usage" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;" title="从已保存的章节文件大小估算历史 token 写入统计（适用于修复中间件之前生成的章节）">📥 补录历史 token</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-panel" id="panel-backup">
+    <div class="card">
+      <h3>备份操作</h3>
+      <div class="toolbar">
+        <button class="btn" id="manual-backup">立即备份</button>
+        <button class="btn" id="refresh-backup">刷新列表</button>
+        <span id="backup-stats" style="margin-left:auto;color:rgba(255,255,255,0.5);font-size:13px;"></span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>备份列表</h3>
+      <div id="backup-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function $(s) { return document.querySelector(s); }
+function $$(s) { return document.querySelectorAll(s); }
+
+function showToast(msg, type) {
+  const el = $("#toast");
+  el.textContent = msg;
+  el.className = "toast show" + (type === "error" ? " error" : "");
+  setTimeout(() => el.classList.remove("show"), 2500);
+}
+
+function fmtNum(n) {
+  if (typeof n !== "number") return "0";
+  if (n >= 10000) return (n / 10000).toFixed(1) + "万";
+  if (n >= 1000) return (n / 1000).toFixed(1) + "k";
+  return n.toString();
+}
+
+function fmtTime(epoch) {
+  if (!epoch) return "-";
+  const d = new Date(epoch * 1000);
+  const pad = n => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / 1024 / 1024).toFixed(2) + " MB";
+}
+
+// ── Tab 切换 ──
+$$(".dash-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    $$(".dash-tab").forEach(t => t.classList.remove("active"));
+    $$(".dash-panel").forEach(p => p.classList.remove("active"));
+    tab.classList.add("active");
+    $("#panel-" + tab.dataset.tab).classList.add("active");
+    if (tab.dataset.tab === "usage") loadUsage();
+    else if (tab.dataset.tab === "backup") loadBackups();
+  });
+});
+
+// ── Usage 加载 ──
+let CURRENT_NOVEL_LIST = [];  // [{novel_id, title, is_current, calls, tokens}]
+
+async function loadNovelList() {
+  try {
+    const r = await fetch("/api/novels");
+    const data = await r.json();
+    const novels = (data.novels || []);
+    const u = await fetch("/api/usage?all_books=true").then(r => r.json());
+    const byNovel = (u.usage || {}).by_novel || {};
+    const currentId = data.current_novel_id || "";
+    CURRENT_NOVEL_LIST = novels.map(n => ({
+      novel_id: n.novel_id,
+      title: n.title,
+      is_current: n.is_current,
+      calls: byNovel[n.novel_id]?.calls || 0,
+      tokens: byNovel[n.novel_id]?.tokens || 0,
+      last_updated: byNovel[n.novel_id]?.last_updated || 0,
+    }));
+    renderNovelSelect(currentId);
+  } catch (e) {
+    console.warn('loadNovelList 失败：', e);
+  }
+}
+
+function renderNovelSelect(currentId) {
+  const sel = $("#usage-novel-select");
+  if (!sel) return;
+  sel.innerHTML = '<option value="__all__">📚 所有书总览</option>';
+  CURRENT_NOVEL_LIST.forEach(n => {
+    const opt = document.createElement('option');
+    opt.value = n.novel_id;
+    const flag = n.is_current ? '🟢 ' : '   ';
+    const stat = n.calls > 0 ? ` · ${n.calls}次 / ${fmtNum(n.tokens)}` : ' · 无记录';
+    opt.textContent = `${flag}${n.title}${stat}`;
+    sel.appendChild(opt);
+  });
+  // 默认选中当前激活
+  if (currentId) {
+    sel.value = currentId;
+  }
+  const label = $("#usage-current-label");
+  if (label) {
+    const cur = CURRENT_NOVEL_LIST.find(n => n.is_current);
+    if (cur) {
+      label.textContent = `（当前激活：${cur.title}）`;
+    } else {
+      label.textContent = `（当前激活 ID：${currentId || "无"}）`;
+    }
+  }
+}
+
+async function loadUsage() {
+  const statsEl = $("#usage-stats");
+  const byRoleEl = $("#by-role-chart");
+  const byProvEl = $("#by-provider-chart");
+  const allCard = $("#all-novels-card");
+  const allList = $("#all-novels-list");
+  statsEl.innerHTML = '<div class="empty">加载中...</div>';
+  byRoleEl.innerHTML = "";
+  byProvEl.innerHTML = "";
+  if (allList) allList.innerHTML = "";
+
+  // 先刷新书单（每次 loadUsage 顺带刷新）
+  await loadNovelList();
+
+  const sel = $("#usage-novel-select");
+  const targetId = sel ? sel.value : "__all__";
+  const url = targetId === "__all__" ? "/api/usage?all_books=true" : `/api/usage?novel_id=${encodeURIComponent(targetId)}`;
+
+  try {
+    const r = await fetch(url);
+    const data = await r.json();
+    if (data.status !== "success") throw new Error("接口错误");
+    const u = data.usage;
+
+    const titleSuffix = targetId === "__all__" ? "（所有书）" : "";
+    statsEl.innerHTML = `
+      <div class="stat">
+        <div class="stat-value">${u.total_calls || 0}</div>
+        <div class="stat-label">总调用次数${titleSuffix}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">${fmtNum(u.total_tokens || 0)}</div>
+        <div class="stat-label">总 Token${titleSuffix}</div>
+        <div class="stat-sub">输入 ${fmtNum(u.total_prompt_tokens || 0)} + 输出 ${fmtNum(u.total_completion_tokens || 0)}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">${(u.total_duration_seconds || 0).toFixed(1)}s</div>
+        <div class="stat-label">总耗时</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">${Object.keys(u.by_provider || {}).length}</div>
+        <div class="stat-label">Provider 数</div>
+        <div class="stat-sub">${Object.entries(u.by_provider || {}).map(([k, v]) => k + ": " + v.calls).join(" / ")}</div>
+      </div>
+    `;
+
+    // 按角色柱状图
+    const byRole = u.by_role || {};
+    const roleEntries = Object.entries(byRole);
+    if (roleEntries.length === 0) {
+      byRoleEl.innerHTML = '<div class="empty">暂无数据</div>';
+    } else {
+      const maxRole = Math.max(...roleEntries.map(([, v]) => v.tokens), 1);
+      byRoleEl.innerHTML = roleEntries.map(([role, v]) => {
+        const pct = maxRole > 0 ? (v.tokens / maxRole * 100).toFixed(1) : 0;
+        return `
+          <div class="bar-row">
+            <div class="bar-label">${role}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+            <div class="bar-value">${v.calls}次 / ${fmtNum(v.tokens)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // 按 provider 柱状图
+    const byProv = u.by_provider || {};
+    const provEntries = Object.entries(byProv);
+    if (provEntries.length === 0) {
+      byProvEl.innerHTML = '<div class="empty">暂无数据</div>';
+    } else {
+      const maxProv = Math.max(...provEntries.map(([, v]) => v.tokens), 1);
+      byProvEl.innerHTML = provEntries.map(([prov, v]) => {
+        const pct = maxProv > 0 ? (v.tokens / maxProv * 100).toFixed(1) : 0;
+        return `
+          <div class="bar-row">
+            <div class="bar-label">${prov}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+            <div class="bar-value">${v.calls}次 / ${fmtNum(v.tokens)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // 全书对比（仅 __all__ 时显示）
+    if (targetId === "__all__" && u.by_novel) {
+      allCard.style.display = "";
+      const byNovel = u.by_novel;
+      const maxTokens = Math.max(...Object.values(byNovel).map(v => v.tokens || 0), 1);
+      const sorted = Object.entries(byNovel).sort((a, b) => (b[1].tokens || 0) - (a[1].tokens || 0));
+      allList.innerHTML = sorted.map(([nid, v]) => {
+        const novel = CURRENT_NOVEL_LIST.find(n => n.novel_id === nid);
+        const title = novel?.title || nid.slice(0, 8) + "...";
+        const flag = novel?.is_current ? "🟢" : "  ";
+        const pct = maxTokens > 0 ? ((v.tokens || 0) / maxTokens * 100).toFixed(1) : 0;
+        return `
+          <div class="bar-row">
+            <div class="bar-label">${flag} ${escapeHtml(title)}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+            <div class="bar-value">${v.calls}次 / ${fmtNum(v.tokens)}</div>
+          </div>
+        `;
+      }).join("") || '<div class="empty">暂无任何书的使用记录</div>';
+    } else {
+      allCard.style.display = "none";
+    }
+  } catch (e) {
+    statsEl.innerHTML = '<div class="empty">加载失败: ' + e.message + "</div>";
+  }
+}
+
+// ── Backup 加载 ──
+async function loadBackups() {
+  const listEl = $("#backup-list");
+  const statsEl = $("#backup-stats");
+  listEl.innerHTML = '<div class="empty">加载中...</div>';
+  try {
+    const r = await fetch("/api/admin/backup");
+    const data = await r.json();
+    if (data.status !== "success") throw new Error("接口错误");
+    const backups = data.backups || [];
+    const stats = data.stats || {};
+
+    statsEl.textContent = `共 ${stats.total_count || 0} 份 · ${stats.total_size_mb || 0} MB · 自动每 ${stats.auto_backup_every_n_chapters || 10} 章 · 保留最近 ${stats.max_backups_to_keep || 30} 份`;
+
+    if (backups.length === 0) {
+      listEl.innerHTML = '<div class="empty">暂无备份。点击上方"立即备份"创建第一份。</div>';
+      return;
+    }
+
+    let html = `<table class="table">
+      <thead><tr>
+        <th>类型</th><th>名称</th><th>大小</th><th>创建时间</th><th>操作</th>
+      </tr></thead><tbody>`;
+    for (const b of backups) {
+      const badge = b.type === "db"
+        ? '<span class="badge badge-db">DB</span>'
+        : '<span class="badge badge-dir">目录</span>';
+      html += `<tr>
+        <td>${badge}</td>
+        <td><code style="font-size:12px;color:rgba(255,255,255,0.7)">${b.name}</code></td>
+        <td>${fmtSize(b.size_bytes)}</td>
+        <td>${fmtTime(b.mtime)}</td>
+        <td>
+          ${b.type === "db" ? `<button class="btn" data-action="restore" data-path="${b.path.replace(/"/g, '&quot;')}">恢复</button>` : '<span style="color:rgba(255,255,255,0.3)">-</span>'}
+        </td>
+      </tr>`;
+    }
+    html += "</tbody></table>";
+    listEl.innerHTML = html;
+
+    // 绑定恢复按钮
+    $$('button[data-action="restore"]').forEach(btn => {
+      btn.addEventListener("click", async () => {
+        if (!confirm("确定要从 " + btn.dataset.path + " 恢复吗？\n恢复前会自动备份当前数据。")) return;
+        try {
+          const r = await fetch("/api/admin/backup/restore", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({backup_path: btn.dataset.path}),
+          });
+          const d = await r.json();
+          if (d.status === "success") {
+            showToast("恢复成功！需要重启 MCP Server 才能生效。");
+            loadBackups();
+          } else {
+            showToast("恢复失败: " + (d.detail || "未知错误"), "error");
+          }
+        } catch (e) {
+          showToast("请求失败: " + e.message, "error");
+        }
+      });
+    });
+  } catch (e) {
+    listEl.innerHTML = '<div class="empty">加载失败: ' + e.message + "</div>";
+  }
+}
+
+// ── 事件绑定 ──
+$("#refresh-usage").addEventListener("click", loadUsage);
+$("#usage-novel-select").addEventListener("change", loadUsage);
+$("#refresh-novel-list").addEventListener("click", async () => {
+  await loadNovelList();
+  await loadUsage();
+  showToast("书单已刷新");
+});
+$("#backfill-usage").addEventListener("click", async () => {
+  const sel = $("#usage-novel-select");
+  const targetId = sel ? sel.value : "";
+  if (targetId === "__all__" || !targetId) {
+    alert("请先在下拉框中选择要补录的**单本书**（不要选「所有书总览」）");
+    return;
+  }
+  if (!confirm(`将根据「${getNovelTitle(targetId)}」的已保存章节文件大小，估算历史 token 用量并写入统计。\n\n此操作适用于：\n  • 中间件修复前生成的章节（当时没自动归类）\n  • 服务重启后历史 records 丢失\n\n估算公式：1 中文字符 ≈ 1.5 token（可改）\n每章默认 ≈ 4 次 LLM 调用（planner/writer/editor/patcher）\n\n确定要补录吗？`)) return;
+  try {
+    const r = await fetch("/api/usage/backfill_from_chapters", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({novel_id: targetId, mode: "add"}),
+    });
+    const d = await r.json();
+    if (d.status !== "success") throw new Error(d.detail || "补录失败");
+    showToast(`✅ 补录完成：${d.chapter_count} 章 ≈ ${fmtNum(d.estimated_tokens)} tokens`);
+    await loadUsage();
+  } catch (e) {
+    showToast("补录失败：" + e.message, "error");
+  }
+});
+function getNovelTitle(nid) {
+  const n = CURRENT_NOVEL_LIST.find(x => x.novel_id === nid);
+  return n ? n.title : nid.slice(0, 8) + "...";
+}
+$("#reset-usage").addEventListener("click", async () => {
+  const sel = $("#usage-novel-select");
+  const targetId = sel ? sel.value : "";
+  const isAll = targetId === "__all__" || !targetId;
+  if (!confirm(`确定要重置${isAll ? "全部" : "当前这本书"}的 token 统计吗？此操作不可撤销。`)) return;
+  try {
+    const url = isAll ? "/api/usage/reset" : `/api/usage/reset?novel_id=${encodeURIComponent(targetId)}`;
+    const r = await fetch(url, {method: "POST"});
+    const d = await r.json();
+    if (d.status === "success") {
+      showToast("已重置");
+      loadUsage();
+    }
+  } catch (e) {
+    showToast("重置失败", "error");
+  }
+});
+$("#manual-backup").addEventListener("click", async () => {
+  $("#manual-backup").disabled = true;
+  $("#manual-backup").textContent = "备份中...";
+  try {
+    const r = await fetch("/api/admin/backup", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({label: "manual", include_novels: true}),
+    });
+    const d = await r.json();
+    if (d.status === "success") {
+      showToast("备份完成！");
+      loadBackups();
+    } else {
+      showToast("备份失败: " + (d.detail || "未知错误"), "error");
+    }
+  } catch (e) {
+    showToast("请求失败: " + e.message, "error");
+  } finally {
+    $("#manual-backup").disabled = false;
+    $("#manual-backup").textContent = "立即备份";
+  }
+});
+$("#refresh-backup").addEventListener("click", loadBackups);
+
+// ── 自动刷新 ──
+let autoRefreshTimer = setInterval(() => {
+  if ($("#panel-usage").classList.contains("active")) loadUsage();
+  else if ($("#panel-backup").classList.contains("active")) loadBackups();
+}, 15000);  // 15s 一次
+
+// 初始加载
+loadUsage();
+</script>
+</body>
+</html>

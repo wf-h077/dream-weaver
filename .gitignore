@@ -1,0 +1,83 @@
+# ===== 敏感配置（必须排除）=====
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# ===== 用户数据（不发布）=====
+novels/
+story_bible.db
+story_bible.db-journal
+*.db
+*.sqlite
+*.sqlite3
+current_novel.json
+
+# ===== 运行日志和临时输出 =====
+.runlogs/
+logs/
+output/
+output2/
+outputs/
+*.log
+*.out
+*.err
+
+# ===== 测试与开发临时文件 =====
+work/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.python-version
+.venv/
+venv/
+env/
+*.egg-info/
+*.egg
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+*.bak
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# ===== 编辑器 =====
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+nbproject/
+nb-configuration/
+
+# ===== 备份文件 =====
+**/*.bak
+**/*.ai_rewritten.bak
+**/*.auto_save.bak
+**/*.before_*.bak
+**/*.test_*.bak
+
+# ===== 已废弃的一次性脚本 =====
+scripts/_deprecated/
+
+# ===== 构建/打包 =====
+dist/
+build/
+*.egg-info/
+*.whl
+
+# ===== 静态资源 =====
+static/app.js.map
+
+# ===== ���ݳ־û��ļ� =====
+data/*.json
+static/*.map

@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>造梦者 | AI 小说创作工作台</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Serif+SC:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+
+<body>
+    <div id="auth-overlay" class="auth-overlay">
+        <div class="auth-atmosphere" aria-hidden="true">
+            <div class="auth-float-card auth-float-a">
+                <span></span><span></span><span></span><span></span>
+            </div>
+            <div class="auth-float-card auth-float-b">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="auth-float-card auth-float-c">
+                <span></span><span></span><span></span><span></span>
+            </div>
+            <div class="auth-timeline auth-timeline-a">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="auth-timeline auth-timeline-b">
+                <span></span><span></span>
+            </div>
+        </div>
+        <div class="auth-shell">
+            <section class="auth-hero" aria-hidden="true">
+                <div class="auth-product-bar">
+                    <div class="auth-brand-mark">
+                        <i data-feather="feather"></i>
+                    </div>
+                    <div class="auth-status-pill">
+                        <span></span>
+                        内测工作台在线
+                    </div>
+                </div>
+                <div class="auth-hero-copy">
+                    <span class="auth-eyebrow">AI 小说创作工作台</span>
+                    <h1>造梦者</h1>
+                    <p>把一句灵感，推进成可连载、可审稿、可归档的长篇作品。</p>
+                </div>
+
+                <div class="auth-command-center">
+                    <div class="auth-editor-preview">
+                        <div class="auth-editor-top">
+                            <span></span><span></span><span></span>
+                            <strong>Chapter Draft</strong>
+                        </div>
+                        <div class="auth-editor-title"></div>
+                        <div class="auth-editor-line long"></div>
+                        <div class="auth-editor-line"></div>
+                        <div class="auth-editor-line short"></div>
+                        <div class="auth-editor-actions">
+                            <span>设定卡</span>
+                            <span>章节规划</span>
+                            <span>风险报告</span>
+                        </div>
+                    </div>
+
+                    <div class="auth-side-cards">
+                        <div class="auth-mini-card active">
+                            <span>规划</span>
+                            <strong>3 个方向</strong>
+                        </div>
+                        <div class="auth-mini-card">
+                            <span>审稿</span>
+                            <strong>风险检测</strong>
+                        </div>
+                        <div class="auth-mini-card">
+                            <span>发布</span>
+                            <strong>草稿包</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="auth-metrics">
+                    <div>
+                        <span>Workflow</span>
+                        <strong>规划 · 写作 · 审稿</strong>
+                    </div>
+                    <div>
+                        <span>Memory</span>
+                        <strong>设定卡持续追踪</strong>
+                    </div>
+                    <div>
+                        <span>Export</span>
+                        <strong>TXT / DOCX / 草稿</strong>
+                    </div>
+                </div>
+            </section>
+
+            <div class="auth-panel">
+                <div class="auth-head">
+                    <i data-feather="feather"></i>
+                    <div>
+                        <h1>造梦者</h1>
+                        <p>邀请制内测登录</p>
+                    </div>
+                </div>
+                <div class="auth-tabs">
+                    <button id="auth-tab-login" class="active" type="button">登录</button>
+                    <button id="auth-tab-register" type="button">注册</button>
+                </div>
+                <div class="auth-field">
+                    <label for="auth-username">用户名</label>
+                    <input id="auth-username" class="ui-input" type="text" placeholder="请输入用户名">
+                </div>
+                <div class="auth-field">
+                    <label for="auth-password">密码</label>
+                    <input id="auth-password" class="ui-input" type="password" placeholder="请输入密码">
+                </div>
+                <div class="auth-field">
+                    <label for="auth-invite">邀请码</label>
+                    <input id="auth-invite" class="ui-input" type="text" placeholder="首次注册需要邀请码">
+                </div>
+                <button id="btn-auth-submit" class="btn btn-primary btn-block">登录</button>
+                <div id="auth-error" class="auth-error"></div>
+                <div class="auth-panel-foot">
+                    小范围内测中，请使用管理员分配的邀请码注册。
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="app-root" class="app-layout hidden">
+        <!-- Vertical Tab Navigation -->
+        <nav class="side-nav">
+            <div class="nav-brand" id="nav-brand" title="返回作品库（首页）" role="button" tabindex="0" aria-label="返回作品库">
+                <i data-feather="feather"></i>
+            </div>
+            <button class="nav-btn sidebar-toggle-btn" id="sidebar-collapse-btn" title="收起侧边栏（Ctrl+B）" aria-label="收起侧边栏">
+                <i data-feather="chevrons-left"></i>
+                <span>收起</span>
+            </button>
+            <button class="nav-btn sidebar-toggle-btn sidebar-expand-nav-btn" id="sidebar-expand-btn" title="展开侧边栏（Ctrl+B）" aria-label="展开侧边栏">
+                <i data-feather="chevrons-right"></i>
+                <span>展开</span>
+            </button>
+
+            <div class="nav-items">
+                <button class="nav-btn" data-tab="tab-library" title="作品库">
+                    <i data-feather="layers"></i>
+                    <span>作品</span>
+                </button>
+                <button class="nav-btn active" data-tab="tab-writing" title="创作流" onclick="openWritingView(event)">
+                    <i data-feather="edit-3"></i>
+                    <span>创作</span>
+                </button>
+            </div>
+            <div class="nav-footer">
+                <a href="/dashboard" class="nav-btn" id="btn-dashboard" title="系统面板" target="_blank">
+                    <i data-feather="bar-chart-2"></i>
+                    <span>面板</span>
+                </a>
+                <button class="nav-btn theme-toggle-btn" id="btn-theme-toggle" title="切换主题">
+                    <i data-feather="moon" id="theme-icon"></i>
+                </button>
+                <button class="nav-btn" id="btn-logout" title="退出登录">
+                    <i data-feather="log-out"></i>
+                    <span id="auth-user-label"></span>
+                </button>
+                <button class="nav-btn" id="btn-pending-notify" title="待确认设定">
+                    <i data-feather="bell"></i>
+                    <span id="pending-count" class="dot hidden"></span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Sidebar Configuration Panel -->
+        <aside class="sidebar">
+            <div id="tab-library" class="tab-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>作品库</h2>
+                        <button id="btn-refresh-novels" class="btn btn-sm"><i data-feather="refresh-cw"></i></button>
+                    </div>
+                    <!-- 全局搜索框（放在作品库面板顶部，跟刷新按钮同区域） -->
+                    <div class="nav-search">
+                        <i data-feather="search" class="nav-search-icon"></i>
+                        <input type="text" id="nav-search-input" class="nav-search-input" placeholder="搜索章节/角色...（按 / 聚焦）" autocomplete="off" />
+                        <div class="nav-search-results" id="nav-search-results" style="display:none;"></div>
+                    </div>
+                    <label class="library-toggle">
+                        <input type="checkbox" id="show-archived-novels">
+                        显示归档作品
+                    </label>
+                    <div id="novels-list" class="list-container"></div>
+                </div>
+            </div>
+
+            <!-- Tab: Writing (Existing logic) -->
+            <div id="tab-writing" class="tab-content active">
+                <!-- 作品总览卡（生成中显示） -->
+                <div id="novel-overview-card" class="novel-overview-card hidden">
+                    <button class="overview-refresh-btn" id="btn-refresh-overview" title="刷新总览/时间线/角色关系">
+                        <i data-feather="refresh-cw"></i>
+                    </button>
+                    <div class="novel-overview-stats">
+                        <div class="novel-overview-stat">
+                            <div class="novel-overview-stat-icon"><i data-feather="book"></i></div>
+                            <div>
+                                <div class="novel-overview-stat-value" id="overview-chapters">0</div>
+                                <div class="novel-overview-stat-label">已写章节</div>
+                            </div>
+                        </div>
+                        <div class="novel-overview-stat">
+                            <div class="novel-overview-stat-icon"><i data-feather="type"></i></div>
+                            <div>
+                                <div class="novel-overview-stat-value" id="overview-words">0</div>
+                                <div class="novel-overview-stat-label">总字数</div>
+                            </div>
+                        </div>
+                        <div class="novel-overview-stat">
+                            <div class="novel-overview-stat-icon"><i data-feather="users"></i></div>
+                            <div>
+                                <div class="novel-overview-stat-value" id="overview-characters">0</div>
+                                <div class="novel-overview-stat-label">角色卡</div>
+                            </div>
+                        </div>
+                        <div class="novel-overview-stat">
+                            <div class="novel-overview-stat-icon"><i data-feather="box"></i></div>
+                            <div>
+                                <div class="novel-overview-stat-value" id="overview-items">0</div>
+                                <div class="novel-overview-stat-label">物品/势力</div>
+                            </div>
+                        </div>
+                        <div class="novel-overview-stat" style="position:relative;">
+                            <div class="novel-overview-stat-icon"><i data-feather="zap"></i></div>
+                            <div>
+                                <div class="novel-overview-stat-value" id="overview-cost">¥0.00</div>
+                                <div class="novel-overview-stat-label">累计成本</div>
+                            </div>
+                            <button id="btn-backfill-cost" class="backfill-btn" title="从已保存的章节文件大小，估算历史 token 写入统计（用于修复前生成的章节）">📥 补录</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="init-panel" class="panel fade-in">
+                    <div class="panel-header">
+                        <h2>起笔建档</h2>
+                        <p class="subtitle">构思你的下一个爆款宇宙</p>
+                    </div>
+
+                    <div class="brainstorm-box">
+                        <label>💡 只有一句灵感也可以开始：</label>
+                        <div class="optional-note">自动模式：输入一句话后，让 AI 负责方向、设定、开局规划和后续管理。</div>
+                        <div class="form-row" style="margin-top: 4px;">
+                            <input type="text" id="brainstorm-seed" placeholder="例如：被退婚后我成了超绝大佬" class="ui-input">
+                            <button id="btn-brainstorm" class="btn btn-sm" style="flex-shrink:0;">生成方向</button>
+                        </div>
+                        <div id="concept-directions-list" class="concept-directions-list"></div>
+                    </div>
+                    <hr style="border:0; border-top:1px dashed var(--border-subtle); margin:8px 0;" />
+
+                    <div class="form-group">
+                        <label>作品名称</label>
+                        <input type="text" id="novel-title" placeholder="例如：剑道独尊" class="ui-input">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>预估连载长度 (章)</label>
+                            <input type="number" id="novel-chapters" value="100" min="1" class="ui-input">
+                        </div>
+                        <div class="form-group half">
+                            <label>单章目标字数</label>
+                            <input type="number" id="chapter-words" value="2500" min="500" step="500" class="ui-input">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>题材类型</label>
+                            <input type="text" id="novel-genre" class="ui-input" placeholder="可自由填写，例如：都市脑洞、末世经营、悬疑恋爱、仙侠群像">
+                        </div>
+                        <div class="form-group half">
+                            <label>行文风格</label>
+                            <select id="novel-style" class="ui-select">
+                                <option value="快节奏爽文，冲突密集，情绪反馈强">快节奏爽文</option>
+                                <option value="杀伐果断，节奏紧凑，行动推动剧情">杀伐果断</option>
+                                <option value="稳健发育，逻辑严密，设定递进清晰">逻辑严密</option>
+                                <option value="幽默风趣，吐槽自然，轻松但不水文">幽默风趣</option>
+                                <option value="悬疑压迫，线索克制，氛围紧张">悬疑压迫</option>
+                                <option value="细腻情感，心理真实，关系拉扯有层次">细腻情感</option>
+                                <option value="甜宠拉扯，互动高频，情绪糖点清楚">甜宠拉扯</option>
+                                <option value="暗黑冷峻，克制锋利，危机感强">暗黑冷峻</option>
+                                <option value="热血升级，目标明确，打脸与成长并重">热血升级</option>
+                                <option value="群像史诗，多线并进，格局宏大">群像史诗</option>
+                                <option value="白描克制，镜头感强，少解释多呈现">白描克制</option>
+                                <option value="古风雅致，辞藻适度，叙事清晰不堆砌">古风雅致</option>
+                                <option value="都市现实，口语自然，生活质感强">都市现实</option>
+                                <option value="电影感叙事，场景鲜明，动作与转场利落">电影感叙事</option>
+                                <option value="自定义">自定义</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <i data-feather="layers" style="width:14px;height:14px;"></i>
+                            风格预设（融合番茄 8 大主流风格 · 推荐）
+                            <a href="javascript:void(0)" id="style-preset-help" style="font-size:12px;color:var(--text-tertiary);margin-left:6px;">这是什么？</a>
+                        </label>
+                        <select id="novel-style-preset" class="ui-select">
+                            <option value="">-- 不使用预设（自由模式）--</option>
+                        </select>
+                        <div id="style-preset-preview" class="style-preset-preview" style="display:none;">
+                            <div class="style-preset-preview-header">
+                                <span class="style-preset-name" id="preset-preview-name"></span>
+                                <span class="style-preset-category" id="preset-preview-category"></span>
+                            </div>
+                            <div class="style-preset-description" id="preset-preview-description"></div>
+                            <div class="style-preset-sub-genres" id="preset-preview-sub-genres"></div>
+                            <div class="style-preset-loglines" id="preset-preview-loglines"></div>
+                        </div>
+                    </div>
+                    <div class="form-group style-custom-group">
+                        <label>风格补充 <span class="optional-label">可选</span></label>
+                        <input type="text" id="novel-style-custom" class="ui-input"
+                            placeholder="例如：第一人称嘴硬心软、短句多、压迫感强、少用华丽比喻">
+                        <div class="style-quick-row">
+                            <button type="button" class="style-chip" data-style-extra="短句为主，节奏更快，少解释，多用动作和对白推进">短句快节奏</button>
+                            <button type="button" class="style-chip" data-style-extra="情绪描写更细腻，人物反应真实，关系拉扯更明显">情绪细腻</button>
+                            <button type="button" class="style-chip" data-style-extra="氛围更压迫，悬念前置，结尾钩子更强">悬念压迫</button>
+                            <button type="button" class="style-chip" data-style-extra="口语自然，吐槽克制，阅读轻松但保持剧情推进">轻松口语</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <i data-feather="target" style="width:14px;height:14px;"></i>
+                            作品核心主题意图 <span class="small-muted">（每章 AI 必读，压制"永动机升级 / 配角工具人 / 主角被动成长"等病灶）</span>
+                        </label>
+                        <textarea id="novel-theme-intent" rows="4" class="ui-textarea"
+                            placeholder="例：本书核心不是爽文升级，是写一个被遗弃的人在废土上找到'家'。苏凌的胜利应来自她建立的社群、她与人的羁绊，而非更多神格。每章至少一段非战斗、非升级的角色关系互动。"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>核心设定</label>
+                        <textarea id="novel-setting" rows="5" class="ui-textarea"
+                            placeholder="描述主角背景、金手指、力量体系..."></textarea>
+                    </div>
+                    <button id="btn-init" class="btn btn-primary btn-block"><i data-feather="zap"></i> 启航创世</button>
+                </div>
+
+                <div id="control-panel" class="panel hidden">
+                    <div class="dashboard-card">
+                        <div class="dash-row"><span class="dash-label">书名</span><strong id="display-title"
+                                class="dash-val">---</strong></div>
+                        <div class="dash-row"><span class="dash-label">行文风格</span><strong id="display-style"
+                                class="dash-val">---</strong></div>
+                        <div class="dash-progress">
+                            <div class="progress-info">
+                                <span>进度</span>
+                                <span>第 <span id="display-chapter">0</span> / <span id="display-total">0</span> 章</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chapter-control-card">
+                        <div class="chapter-control-header">
+                            <h3><i data-feather="sliders"></i> 可选：本章导演指令</h3>
+                            <div class="chapter-control-actions">
+                                <button id="btn-toggle-chapter-controls" class="btn btn-sm" type="button">展开</button>
+                                <button id="btn-reset-chapter-controls" class="btn btn-sm" type="button">清空</button>
+                            </div>
+                        </div>
+                        <div class="optional-note">不填写也可以，AI 会根据大纲、前情、设定卡和风险检查自动管理本章。</div>
+                        <div id="chapter-control-body" class="optional-panel-body hidden">
+                        <textarea id="chapter-free-instruction" rows="3" class="ui-textarea chapter-free-instruction" placeholder="直接输入你对下一章的想法：例如下一章写主角第一次公开反击，但不要太快暴露底牌，结尾让对手意识到他背后有人。"></textarea>
+                        <textarea id="chapter-goal" rows="2" class="ui-textarea" placeholder="本章目标：例如完成退婚羞辱后的第一次反击"></textarea>
+                        <div class="form-row">
+                            <select id="chapter-mood" class="ui-select">
+                                <option value="">情绪不限</option>
+                                <option value="压抑后爆发">压抑后爆发</option>
+                                <option value="爽快反击">爽快反击</option>
+                                <option value="紧张悬疑">紧张悬疑</option>
+                                <option value="热血昂扬">热血昂扬</option>
+                                <option value="暧昧拉扯">暧昧拉扯</option>
+                            </select>
+                            <select id="chapter-pace" class="ui-select">
+                                <option value="">节奏不限</option>
+                                <option value="快节奏，高冲突">快节奏</option>
+                                <option value="中速推进，信息增量清晰">中速推进</option>
+                                <option value="慢热铺垫，重氛围">慢热铺垫</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <select id="chapter-pov" class="ui-select">
+                                <option value="">视角不限</option>
+                                <option value="主角视角">主角视角</option>
+                                <option value="反派视角开场">反派视角开场</option>
+                                <option value="第三人称全知">第三人称全知</option>
+                                <option value="单女主/单男主近景视角">近景视角</option>
+                            </select>
+                            <input type="number" id="chapter-control-words" class="ui-input" min="500" step="500" placeholder="本章字数">
+                        </div>
+                        <input type="text" id="chapter-must-characters" class="ui-input" placeholder="必须出现人物，用逗号分隔">
+                        <div class="control-chip-panel">
+                            <div class="control-chip-title">角色卡</div>
+                            <div id="chapter-character-chips" class="control-chip-list"></div>
+                        </div>
+                        <textarea id="chapter-must-settings" rows="2" class="ui-textarea" placeholder="必须引用设定/物品/势力/地点"></textarea>
+                        <div class="control-chip-panel">
+                            <div class="control-chip-title">设定卡</div>
+                            <div id="chapter-setting-chips" class="control-chip-list"></div>
+                        </div>
+                        <textarea id="chapter-must-hooks" rows="2" class="ui-textarea" placeholder="必须处理或回收的伏笔"></textarea>
+                        <input type="text" id="chapter-ending-hook" class="ui-input" placeholder="章末钩子：例如暴露更大敌人/身份反转">
+                        <textarea id="chapter-notes" rows="2" class="ui-textarea" placeholder="其他临时备注"></textarea>
+                    </div>
+                        </div>
+                    <button id="btn-generate" class="btn btn-primary btn-block btn-lg"><i data-feather="play"></i>
+                        自动生成下一章</button>
+                    <button id="btn-batch-generate" class="btn btn-block btn-batch-generate" type="button">
+                        <i data-feather="zap"></i> 批量续写 N 章
+                    </button>
+                    <div class="export-bar" id="export-bar">
+                        <button class="export-btn" data-format="txt" title="导出纯文本（最通用）">
+                            <i data-feather="file-text"></i> TXT
+                        </button>
+                        <button class="export-btn" data-format="docx" title="导出 Word 文档（可编辑）">
+                            <i data-feather="file"></i> DOCX
+                        </button>
+                    </div>
+                    <button id="btn-finish-novel" class="btn btn-block btn-finish-novel">
+                        <i data-feather="flag"></i> 结束并归档本书
+                    </button>
+                    <button id="btn-new-novel" class="btn btn-block"
+                        style="background-color: #ffffff; border: 1px solid #e2e8f0; color: #64748b; font-size: 0.85rem; margin-top: 8px; height: 44px; cursor: pointer; border-radius: 6px; transition: all 0.2s;">
+                        <i data-feather="refresh-cw"
+                            style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> 重新开始
+                    </button>
+                    <div id="loading-state" class="loading-state hidden">
+                        <div class="spinner"></div><span id="loading-text">推演中...</span>
+                        <button id="btn-retry-task" class="btn btn-sm hidden" type="button">
+                            <i data-feather="rotate-ccw"></i> 重试任务
+                        </button>
+                        <div id="task-log" class="task-log"></div>
+                    </div>
+
+                    <!-- 批量续写面板 -->
+                    <div id="batch-panel" class="batch-panel hidden">
+                        <div class="batch-config">
+                            <h3><i data-feather="zap"></i> 批量续写</h3>
+                            <div class="optional-note">一次性生成多章，可中途暂停。建议先在硬盘留 2GB 空间。</div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>起始章节</label>
+                                    <input type="number" id="batch-start" value="" min="1" class="ui-input" placeholder="自动从当前">
+                                </div>
+                                <div class="form-group half">
+                                    <label>续写章数</label>
+                                    <input type="number" id="batch-count" value="5" min="1" max="100" class="ui-input">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>遇错策略</label>
+                                    <select id="batch-on-error" class="ui-select">
+                                        <option value="true">遇错即停</option>
+                                        <option value="false">跳过继续</option>
+                                    </select>
+                                </div>
+                                <div class="form-group half">
+                                    <label>每章重试</label>
+                                    <input type="number" id="batch-max-retries" value="1" min="0" max="3" class="ui-input">
+                                </div>
+                            </div>
+                            <div class="batch-estimated-cost">
+                                <i data-feather="info"></i>
+                                <span>预估成本：单章约 ¥0.5-1.5（按 M3 写手 + 本地 27B 审稿）</span>
+                            </div>
+                            <div class="form-row">
+                                <button id="btn-batch-start" class="btn btn-primary btn-block">
+                                    <i data-feather="play-circle"></i> 开始跑批
+                                </button>
+                                <button id="btn-batch-cancel-config" class="btn btn-block">
+                                    取消
+                                </button>
+                            </div>
+                        </div>
+                        <div id="batch-progress" class="batch-progress hidden">
+                            <h3><i data-feather="activity"></i> 跑批进度</h3>
+                            <div class="batch-progress-bar-bg">
+                                <div id="batch-progress-fill" class="batch-progress-fill"></div>
+                            </div>
+                            <div class="batch-progress-info">
+                                <span id="batch-progress-text">0 / 0 章</span>
+                                <span id="batch-progress-elapsed">00:00</span>
+                            </div>
+                            <div id="batch-current-chapter" class="batch-current-chapter"></div>
+                            <div id="batch-log" class="batch-log"></div>
+                            <div class="batch-actions">
+                                <button id="btn-batch-stop" class="btn btn-sm btn-danger">停止跑批</button>
+                            </div>
+                        </div>
+                        <div id="batch-summary" class="batch-summary hidden">
+                            <h3><i data-feather="check-circle"></i> 跑批完成</h3>
+                            <div class="batch-summary-stats" id="batch-summary-stats"></div>
+                            <div class="batch-summary-chapters" id="batch-summary-chapters"></div>
+                            <button id="btn-batch-close" class="btn btn-block">关闭</button>
+                        </div>
+                    </div>
+
+                    <div class="timeline-container">
+                        <h3><i data-feather="clock"></i> 记忆摘要</h3>
+                        <div id="story-so-far" class="story-so-far-box">暂无摘要</div>
+                    </div>
+
+                    <!-- 剧情时间线（按章节节点展示） -->
+                    <div class="timeline-container timeline-v2" id="story-timeline-v2">
+                        <h3>
+                            <i data-feather="git-commit"></i> 剧情时间线
+                            <span class="timeline-meta" id="timeline-meta"></span>
+                        </h3>
+                        <div class="timeline-track" id="timeline-track">
+                            <div class="timeline-empty">还没有章节，先生成第 1 章后会出现时间线</div>
+                        </div>
+                    </div>
+
+                    <!-- 角色关系图（中心-辐射 SVG） -->
+                    <div class="timeline-container" id="character-relation-box">
+                        <h3>
+                            <i data-feather="users"></i> 角色关系
+                            <span class="timeline-meta" id="relation-meta"></span>
+                        </h3>
+                        <div class="relation-svg-wrap">
+                            <svg id="relation-svg" class="relation-svg" viewBox="0 0 400 320" preserveAspectRatio="xMidYMid meet"></svg>
+                        </div>
+                        <div class="relation-empty" id="relation-empty">还没有角色卡，到「设定」tab 添加角色后会显示关系图</div>
+                    </div>
+                </div>
+            </div>        </aside>
+
+        <!-- Main Display Area -->
+        <main class="main-board">
+            <header class="board-header">
+                <div class="chapter-meta">
+                    <h2 id="reader-title" class="chapter-title">未开始</h2>
+                    <div id="word-count" class="tag"><i data-feather="file-text"></i> 字数: 0</div>
+                </div>
+                <div class="board-header-actions">
+                    <button class="header-icon-btn" id="btn-open-dashboard" title="打开写作仪表盘" aria-label="写作仪表盘">
+                        <i data-feather="bar-chart-2"></i>
+                        <span>仪表盘</span>
+                    </button>
+                    <button class="header-icon-btn" id="reflection-expand-btn" title="切换复盘栏 (Ctrl+Shift+E)" aria-label="切换复盘栏">
+                        <i data-feather="message-square"></i>
+                        <span>复盘</span>
+                    </button>
+                    <button class="assistant-toggle-btn" id="assistant-toggle-btn" title="打开资源栏 (Ctrl+Shift+A)" aria-label="打开资源栏">
+                        <i data-feather="layers"></i>
+                        <span>资源</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="board-body">
+                <section class="board-layout">
+                <article class="board-canvas">
+                    <div class="canvas-toolbar">
+                        <button id="btn-prev-chapter" class="btn btn-sm" style="display:none;" title="上一章（快捷键 [）">
+                            <i data-feather="chevron-left"></i> 上一章
+                        </button>
+                        <div id="chapter-jump-group" class="chapter-jump-group" style="display:none;" title="跳到指定章节">
+                            <input id="chapter-jump-input" type="number" min="1" max="9999" step="1" placeholder="章号" class="ui-input chapter-jump-input">
+                            <span class="chapter-jump-sep">/</span>
+                            <span id="chapter-jump-total" class="chapter-jump-total">?</span>
+                            <button id="btn-chapter-jump" class="btn btn-sm" type="button">
+                                <i data-feather="arrow-right"></i> Go
+                            </button>
+                        </div>
+                        <button id="btn-next-chapter" class="btn btn-sm" style="display:none;" title="下一章（快捷键 ]）">
+                            下一章 <i data-feather="chevron-right"></i>
+                        </button>
+                        <button id="btn-edit-toggle" class="btn btn-sm" style="display:none;">
+                            <i data-feather="edit-2"></i> 编辑
+                        </button>
+                        <button id="btn-versions" class="btn btn-sm" style="display:none;">
+                            <i data-feather="clock"></i> 版本
+                        </button>
+                        <button id="btn-ai-rewrite" class="btn btn-sm" style="display:none;" title="选中正文后点击，AI 改写选中文本">
+                            <i data-feather="edit-3"></i> AI 改写选中
+                        </button>
+                        <button id="btn-ai-continue" class="btn btn-sm" style="display:none;" title="AI 续写本章">
+                            <i data-feather="fast-forward"></i> AI 续写
+                        </button>
+                        <button id="btn-chapter-feedback" class="btn btn-sm btn-feedback" style="display:none;" title="对整章写反馈意见，AI 修订后并排对比">
+                            <i data-feather="message-circle"></i> 反馈修订
+                        </button>
+                        <button id="btn-publish-pack" class="btn btn-sm btn-publish" style="display:none;" title="查看发布包：番茄格式检测 + 一键发布到番茄">
+                            <i data-feather="package"></i> 发布包
+                        </button>
+                        <button id="btn-save-chapter" class="btn btn-sm btn-primary" style="display:none;">
+                            <i data-feather="save"></i> 保存编辑
+                        </button>
+                        <button id="btn-cancel-edit" class="btn btn-sm" style="display:none;">
+                            <i data-feather="x"></i> 取消
+                        </button>
+                    </div>
+                    <div id="reader-content" class="novel-content">
+                        <div class="empty-canvas"><i data-feather="book-open"></i>
+                            <p>请点击开始创作</p>
+                        </div>
+                    </div>
+                </article>
+
+                <aside class="author-reflection" id="author-reflection">
+                    <div class="reflection-header">
+                        <i data-feather="cpu"></i> AI 复盘总结
+                        <button class="reflection-collapse-btn" id="reflection-collapse-btn" title="收回复盘栏 (Ctrl+Shift+E)" aria-label="收回复盘栏">
+                            <i data-feather="chevron-right"></i>
+                        </button>
+                    </div>
+                    <div id="ai-review-box" class="reflection-body">
+                        等待章节生成后提供复盘...
+                    </div>
+                    <div class="reflection-critical-section mt-3">
+                        <button class="btn btn-sm btn-critical" id="btn-critical-review" title="用挑剔编辑视角对本章挑刺（压制 AI 写作的典型病灶）">
+                            <i data-feather="zap"></i> 批判审稿
+                        </button>
+                        <div id="critical-review-box" class="critical-review-body hidden mt-2">
+                            <div class="critical-review-content"></div>
+                            <div class="critical-review-meta small-muted mt-2"></div>
+                        </div>
+                    </div>
+                    <div class="reflection-critical-section mt-2">
+                        <button class="btn btn-sm btn-anti-ai" id="btn-anti-ai-flavor" title="识别本章的 AI 套话（眼神深邃/嘴角勾起等），给出改写建议">
+                            <i data-feather="feather"></i> 反 AI 味
+                        </button>
+                        <div id="anti-ai-box" class="anti-ai-body hidden mt-2">
+                            <div class="anti-ai-summary"></div>
+                            <div class="anti-ai-issues"></div>
+                        </div>
+                    </div>
+
+                    <div id="versions-box" class="versions-box mt-4 hidden">
+                        <div class="reflection-header"><i data-feather="clock"></i> 版本历史</div>
+                        <div id="versions-list" class="versions-list"></div>
+                        <div id="version-diff" class="version-diff"></div>
+                    </div>
+
+                    <div class="patch-records-box mt-4">
+                        <div class="reflection-header"><i data-feather="tool"></i> 补丁记录</div>
+                        <div id="patch-records-list" class="patch-records-list"></div>
+                    </div>
+
+                    <div class="chapter-control-history-box mt-4">
+                        <div class="reflection-header"><i data-feather="sliders"></i> 本章控制</div>
+                        <div id="chapter-control-history-list" class="chapter-control-history-list"></div>
+                    </div>
+
+                    <div class="pending-extractions-box mt-4">
+                        <div class="reflection-header"><i data-feather="check-circle"></i> 设定待确认区</div>
+                        <div id="pending-list" class="pending-list"></div>
+                    </div>
+
+                    <div class="risk-report-box mt-4">
+                        <div class="reflection-header risk-report-header">
+                            <span><i data-feather="alert-triangle"></i> 本章风险</span>
+                            <div class="risk-report-actions">
+                                <button id="btn-auto-fix-risks" class="btn btn-sm btn-primary" type="button" onclick="autoFixChapterRisks()">
+                                    <i data-feather="tool"></i> 一键修复
+                                </button>
+                                <button class="btn btn-sm" type="button" onclick="enableCurrentChapterEdit()">
+                                    <i data-feather="edit-2"></i> 手动编辑
+                                </button>
+                                <button id="btn-refresh-risks" class="btn btn-sm" type="button" onclick="refreshChapterRisks()">
+                                    <i data-feather="refresh-cw"></i> 刷新
+                                </button>
+                            </div>
+                        </div>
+                        <div id="risk-report-list" class="risk-report-list"></div>
+                    </div>
+                </aside>
+            </section>
+            <!-- 创作资源辅助栏（侧栏，可折叠） -->
+            <aside class="creation-assistant" id="creation-assistant">
+                <div class="assistant-header">
+                    <div class="assistant-tabs" role="tablist">
+                        <button class="assistant-tab active" data-assistant="world" role="tab" title="世界设定 / 角色卡">
+                            <i data-feather="globe"></i>
+                            <span>设定</span>
+                        </button>
+                        <button class="assistant-tab" data-assistant="inspiration" role="tab" title="灵感收集">
+                            <i data-feather="zap"></i>
+                            <span>灵感</span>
+                        </button>
+                        <button class="assistant-tab" data-assistant="hooks" role="tab" title="伏笔线">
+                            <i data-feather="anchor"></i>
+                            <span>伏笔</span>
+                        </button>
+                    </div>
+                    <button class="assistant-close" id="assistant-close-btn" title="关闭资源栏 (Ctrl+Shift+A)">
+                        <i data-feather="chevron-right"></i>
+                    </button>
+                </div>
+                <div class="assistant-content">
+        <div class="assistant-pane active" data-assistant="world" role="tabpanel">
+    <div class="panel">
+            <div class="panel">
+                                    <div class="panel-header">
+                            <h2>可选：世界规则</h2>
+                        </div>
+                        <div class="optional-note">不填写也可以，AI 会从章节中自动提取设定；这里只用于锁定必须遵守的硬规则。</div>
+                        <div class="workbench-form">
+                            <input type="text" id="rule-category" placeholder="分类 (如: 境界/地理)" class="ui-input mb-2">
+                            <textarea id="rule-text" rows="3" placeholder="具体规则或能力限制..."
+                                class="ui-textarea mb-2"></textarea>
+                            <button id="btn-add-rule" class="btn btn-sm btn-block">添加规则</button>
+                        </div>
+                        <div id="world-rules-list" class="list-container mt-4"></div>
+                                </div>
+    </div>
+    <div class="panel">
+            <div class="panel">
+                                    <div class="panel-header mt-4">
+                            <h2>可选：文风稳定器</h2>
+                        </div>
+                        <div class="optional-note">不设置时按作品基础风格写；设置后 AI 会持续贴近样本文风，并检测章节是否跑味。</div>
+                        <div class="workbench-form">
+                            <input type="text" id="style-profile-name" placeholder="文风名称，例如：冷峻爽文 / 细腻古风"
+                                class="ui-input mb-2">
+                            <textarea id="style-sample-text" rows="5" placeholder="粘贴一段你想模仿的文风样本，系统会提取叙述口吻、句式节奏、对白密度和禁用表达..."
+                                class="ui-textarea mb-2"></textarea>
+                            <button id="btn-analyze-style" class="btn btn-sm btn-block">分析并设为默认文风</button>
+                        </div>
+                        <div id="style-profiles-list" class="list-container mt-4"></div>
+                                </div>
+    </div>
+    <div class="panel">
+            <div class="panel">
+                                    <div class="panel-header mt-4">
+                            <h2>可选：关键设定卡</h2>
+                        </div>
+                        <div class="optional-note">AI 会自动提取设定；你也可以手动锁定重要人物、物品、势力和地点。</div>
+                        <div class="form-row mb-2">
+                            <button id="btn-extract-entities" class="btn btn-sm btn-block" title="从最新章节正文调 LLM 提取角色/物品/势力/地点，自动入库为卡">
+                                <i data-feather="download"></i> 📥 从最新章节提取实体
+                            </button>
+                        </div>
+                        <div class="workbench-form">
+                            <div class="form-row mb-2">
+                                <select id="entity-card-type" class="ui-select" onchange="onEntityCardTypeChange()">
+                                    <option value="character">角色</option>
+                                    <option value="item">物品</option>
+                                    <option value="faction">势力</option>
+                                    <option value="location">地点</option>
+                                </select>
+                                <select id="entity-card-gender" class="ui-select" style="display:none;width:90px;" title="角色性别">
+                                    <option value="未知">性别</option>
+                                    <option value="男">男</option>
+                                    <option value="女">女</option>
+                                </select>
+                                <input type="text" id="entity-card-name" placeholder="名称" class="ui-input">
+                            </div>
+                            <div id="entity-card-independent-goal-wrap" class="form-group mb-2" style="display:none;">
+                                <label>
+                                    <i data-feather="compass" style="width:13px;height:13px;"></i>
+                                    独立目标 <span class="small-muted">（不是为主角服务，是角色自己想做的事）</span>
+                                </label>
+                                <textarea id="entity-card-independent-goal" rows="2" class="ui-textarea"
+                                    placeholder="例：我的目标是把孙子送出极北，不是给苏凌挡刀"></textarea>
+                            </div>
+                            <div id="entity-card-fields" class="entity-fields-editor mb-2"></div>
+                            <button type="button" class="btn btn-sm btn-block mb-2" onclick="addEntityFieldRow()">新增字段</button>
+                            <input type="text" id="entity-card-note" placeholder="备注" class="ui-input mb-2">
+                            <button id="btn-save-entity-card" class="btn btn-sm btn-block">保存设定卡</button>
+                        </div>
+                        <div class="card-filter-row">
+                            <button class="card-filter active" data-card-type="">全部</button>
+                            <button class="card-filter" data-card-type="character">角色</button>
+                            <button class="card-filter" data-card-type="item">物品</button>
+                            <button class="card-filter" data-card-type="faction">势力</button>
+                            <button class="card-filter" data-card-type="location">地点</button>
+                        </div>
+                        <div id="entity-cards-list" class="list-container mt-4"></div>
+                        </div>
+    </div>
+</div>
+
+<div class="assistant-pane" data-assistant="inspiration" role="tabpanel">
+    <div class="panel">
+            <div class="panel">
+                                    <div class="panel-header">
+                            <h2>灵感收集箱</h2>
+                        </div>
+                        <div class="workbench-form">
+                            <textarea id="insp-content" rows="3" placeholder="记下一个绝妙的点子..."
+                                class="ui-textarea mb-2"></textarea>
+                            <input type="text" id="insp-tags" placeholder="标签 (用逗号分隔)" class="ui-input mb-2">
+                            <button id="btn-add-insp" class="btn btn-sm btn-block">存入箱中</button>
+                        </div>
+                        <div id="inspirations-list" class="list-container mt-4"></div>
+                        </div>
+    </div>
+</div>
+
+<div class="assistant-pane" data-assistant="hooks" role="tabpanel">
+    <div class="panel">
+            <div class="panel">
+                                    <div class="panel-header">
+                            <h2>伏笔埋设</h2>
+                        </div>
+                        <div class="workbench-form">
+                            <textarea id="hook-content" rows="3" placeholder="设定一个未来的伏笔..."
+                                class="ui-textarea mb-2"></textarea>
+                            <div class="form-row">
+                                <label class="flex-center">目标章节:</label>
+                                <input type="number" id="hook-chapter" value="10" class="ui-input small-input">
+                            </div>
+                            <button id="btn-add-hook" class="btn btn-sm btn-block mt-2">设下伏笔</button>
+                        </div>
+                        <div id="hooks-list" class="list-container mt-4"></div>
+                        </div>
+    </div>
+</div>
+    
+                
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- 危险操作确认 modal（防误删） -->
+    <div id="confirm-danger-modal" class="modal confirm-danger-modal" style="display:none;">
+        <div class="modal-backdrop" data-confirm-cancel="1"></div>
+        <div class="modal-content modal-confirm-danger" role="alertdialog" aria-modal="true">
+            <div class="confirm-danger-icon" id="confirm-danger-icon">⚠️</div>
+            <h3 class="confirm-danger-title" id="confirm-danger-title">确认操作</h3>
+            <p class="confirm-danger-msg" id="confirm-danger-msg">确定执行此操作吗？</p>
+            <div class="confirm-danger-warning" id="confirm-danger-warning" style="display:none;">
+                <i data-feather="alert-triangle"></i>
+                <span>此操作不可撤销</span>
+            </div>
+            <div class="confirm-danger-actions">
+                <button class="btn btn-ghost" id="confirm-danger-cancel" data-confirm-cancel="1">取消（默认）</button>
+                <button class="btn btn-danger" id="confirm-danger-ok">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Undo Toast（显示在右下角） -->
+    <div id="undo-toast" class="undo-toast hidden">
+        <div class="undo-toast-content">
+            <i data-feather="rotate-ccw"></i>
+            <span id="undo-toast-msg">已撤销</span>
+            <button class="undo-toast-btn" id="undo-toast-btn">撤销 (Ctrl+Z)</button>
+        </div>
+    </div>
+
+    <!-- 写作仪表盘（点击 📊 按钮弹出） -->
+    <div id="dashboard-modal" class="modal dashboard-modal" style="display:none;">
+        <div class="modal-backdrop" data-close-dashboard="1"></div>
+        <div class="modal-content modal-dashboard" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h3>📊 写作仪表盘</h3>
+                <button class="modal-close" data-close-dashboard="1" aria-label="关闭">×</button>
+            </div>
+            <div class="dashboard-body">
+                <!-- 4 个核心指标 -->
+                <div class="dashboard-stats">
+                    <div class="dashboard-stat">
+                        <div class="stat-icon" style="background:rgba(99,102,241,0.1);color:#6366f1;"><i data-feather="book"></i></div>
+                        <div>
+                            <div class="stat-value" id="dash-stat-chapters">--</div>
+                            <div class="stat-label">已完成章节</div>
+                        </div>
+                    </div>
+                    <div class="dashboard-stat">
+                        <div class="stat-icon" style="background:rgba(34,197,94,0.1);color:#22c55e;"><i data-feather="type"></i></div>
+                        <div>
+                            <div class="stat-value" id="dash-stat-words">--</div>
+                            <div class="stat-label">总字数</div>
+                        </div>
+                    </div>
+                    <div class="dashboard-stat">
+                        <div class="stat-icon" style="background:rgba(251,191,36,0.1);color:#f59e0b;"><i data-feather="zap"></i></div>
+                        <div>
+                            <div class="stat-value" id="dash-stat-cost">--</div>
+                            <div class="stat-label">累计成本</div>
+                        </div>
+                    </div>
+                    <div class="dashboard-stat">
+                        <div class="stat-icon" style="background:rgba(168,85,247,0.1);color:#a855f7;"><i data-feather="users"></i></div>
+                        <div>
+                            <div class="stat-value" id="dash-stat-characters">--</div>
+                            <div class="stat-label">角色卡</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 详细面板：当前作品信息 -->
+                <div class="dashboard-section">
+                    <h4>当前作品</h4>
+                    <div class="dashboard-row" id="dash-current-novel">
+                        <div class="row-label">作品名</div><div class="row-value" id="dash-novel-title">--</div>
+                    </div>
+                    <div class="dashboard-row">
+                        <div class="row-label">题材</div><div class="row-value" id="dash-novel-genre">--</div>
+                    </div>
+                    <div class="dashboard-row">
+                        <div class="row-label">目标章节</div><div class="row-value" id="dash-novel-target">--</div>
+                    </div>
+                    <div class="dashboard-row">
+                        <div class="row-label">当前章节</div><div class="row-value" id="dash-novel-current">--</div>
+                    </div>
+                </div>
+
+                <!-- 章节类型分布（最近 10 章） -->
+                <div class="dashboard-section">
+                    <h4>
+                        最近 10 章类型分布
+                        <button class="btn-mini" id="btn-chapter-type-detect" title="调用 LLM 重新分析最近 10 章的类型构成">
+                            <i data-feather="refresh-cw"></i> 检测
+                        </button>
+                    </h4>
+                    <div class="chapter-type-bar" id="chapter-type-bar">
+                        <div class="empty-hint">点击"检测"按钮分析最近 10 章</div>
+                    </div>
+                    <div class="chapter-type-legend">
+                        <span class="legend-item"><span class="legend-dot" style="background:#ef4444;"></span>战斗</span>
+                        <span class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span>对话</span>
+                        <span class="legend-item"><span class="legend-dot" style="background:#a855f7;"></span>独白</span>
+                        <span class="legend-item"><span class="legend-dot" style="background:#10b981;"></span>日常</span>
+                        <span class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span>设定</span>
+                        <span class="legend-item"><span class="legend-dot" style="background:#ec4899;"></span>情感</span>
+                    </div>
+                    <div class="chapter-type-warning" id="chapter-type-warning" style="display:none;"></div>
+                </div>
+
+                <!-- 大纲对照（最近 20 章） -->
+                <div class="dashboard-section">
+                    <h4>
+                        大纲覆盖度检查
+                        <button class="btn-mini" id="btn-outline-coverage" title="对比大纲与已写章节正文，找出跳过的剧情节点">
+                            <i data-feather="refresh-cw"></i> 对照
+                        </button>
+                    </h4>
+                    <div id="outline-coverage-result">
+                        <div class="empty-hint">点击"对照"按钮检查大纲覆盖度</div>
+                    </div>
+                </div>
+
+                <!-- 最近写作活动 -->
+                <div class="dashboard-section">
+                    <h4>最近写作</h4>
+                    <div class="dashboard-recent" id="dash-recent-list">
+                        <div class="empty-hint">加载中...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快捷键面板（按 ? 键弹出） -->
+    <div id="shortcuts-modal" class="modal shortcuts-modal" style="display:none;">
+        <div class="modal-backdrop" data-close-shortcuts="1"></div>
+        <div class="modal-content modal-shortcuts" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h3>⌨️ 快捷键面板</h3>
+                <button class="modal-close" data-close-shortcuts="1" aria-label="关闭">×</button>
+            </div>
+            <div class="shortcuts-body">
+                <div class="shortcut-section">
+                    <h4>导航</h4>
+                    <div class="shortcut-item"><span class="shortcut-keys"><kbd>/</kbd></span><span>聚焦全局搜索</span></div>
+                    <div class="shortcut-item"><span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>B</kbd></span><span>折叠/展开侧边栏</span></div>
+                    <div class="shortcut-item"><span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd></span><span>折叠/展开资源栏</span></div>
+                    <div class="shortcut-item"><span class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd></span><span>折叠/展开复盘栏</span></div>
+                </div>
+                <div class="shortcut-section">
+                    <h4>辅助</h4>
+                    <div class="shortcut-item"><span class="shortcut-keys"><kbd>?</kbd></span><span>显示/隐藏本面板</span></div>
+                    <div class="shortcut-item"><span class="shortcut-keys"><kbd>Esc</kbd></span><span>关闭任何打开的模态框</span></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span class="small-muted">提示：所有快捷键在输入框/textarea 内自动失效，避免误触</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新手引导（首次登录自动弹出） -->
+    <div id="onboarding-modal" class="modal onboarding-modal" style="display:none;" data-skip-on-close="1">
+        <div class="modal-backdrop" data-skip-onboarding="1"></div>
+        <div class="modal-content modal-onboarding" role="dialog" aria-modal="true" data-skip-on-close="1">
+            <button class="modal-close onboarding-skip" data-skip-onboarding="1" aria-label="跳过引导">×</button>
+            <div class="onboarding-content">
+                <!-- Step 1: 欢迎 -->
+                <div class="onboarding-step active" data-step="1">
+                    <div class="onboarding-icon">🪶</div>
+                    <h2>欢迎来到造梦者</h2>
+                    <p class="onboarding-subtitle">AI 辅助长篇网文创作工作台</p>
+                    <p class="onboarding-desc">
+                        造梦者能帮你从一句话灵感出发，<strong>搭建世界观、生成长篇大纲、逐章续写</strong>，
+                        还能做风险检测、风格一致性检查、批量跑批。<br>
+                        整个过程你都可以随时介入、修改方向、暂停。
+                    </p>
+                </div>
+                <!-- Step 2: 选作品 -->
+                <div class="onboarding-step" data-step="2">
+                    <div class="onboarding-icon">📚</div>
+                    <h2>第 1 步：建一部作品</h2>
+                    <p class="onboarding-subtitle">从左侧"作品" tab 开始</p>
+                    <p class="onboarding-desc">
+                        首次使用建议先在 <strong>左侧"作品" tab</strong> 点"打开"已有的作品。
+                        如果是新建，请点击"创作" tab → 输入一句话灵感 → AI 自动生成方向和大纲。
+                    </p>
+                    <p class="onboarding-tip">💡 新作品必填：作品名称、题材、文风。</p>
+                </div>
+                <!-- Step 3: 开始写 -->
+                <div class="onboarding-step" data-step="3">
+                    <div class="onboarding-icon">✍️</div>
+                    <h2>第 2 步：开始创作</h2>
+                    <p class="onboarding-subtitle">从"创作" tab 写第一章</p>
+                    <p class="onboarding-desc">
+                        点击 <strong>左侧"创作" tab</strong>，主区会显示章节正文。点底部"生成下一章"或
+                        "批量跑批"开始续写。<br>
+                        右侧"📚 资源"是设定/灵感/伏笔，右侧"💬 复盘"是 AI 审稿和批判审稿。
+                    </p>
+                    <p class="onboarding-tip">💡 试试按 <kbd>?</kbd> 查看所有快捷键。</p>
+                </div>
+            </div>
+            <div class="onboarding-footer">
+                <div class="onboarding-dots">
+                    <span class="dot active" data-dot="1"></span>
+                    <span class="dot" data-dot="2"></span>
+                    <span class="dot" data-dot="3"></span>
+                </div>
+                <div class="onboarding-actions">
+                    <button class="btn btn-ghost onboarding-skip-text" data-skip-onboarding="1">跳过</button>
+                    <button class="btn btn-ghost" id="onboarding-prev" style="display:none;">上一步</button>
+                    <button class="btn btn-primary" id="onboarding-next">下一步 →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 章节反馈模态框（输入反馈 → AI 修订） -->
+    <div id="chapter-feedback-modal" class="modal" style="display:none;">
+        <div class="modal-backdrop" data-close="1"></div>
+        <div class="modal-content modal-feedback" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h3>
+                    <i data-feather="message-circle"></i>
+                    对第 <span id="fb-chapter-num">?</span> 章写反馈 · AI 修订
+                </h3>
+                <button class="modal-close" data-close="1" aria-label="关闭">×</button>
+            </div>
+            <div class="modal-body modal-feedback-body">
+                <div class="feedback-pane">
+                    <div class="feedback-pane-label">
+                        <i data-feather="book-open" style="width:14px;height:14px;"></i>
+                        原文章节（只读）
+                    </div>
+                    <div id="fb-original-preview" class="feedback-original"></div>
+                </div>
+                <div class="feedback-pane">
+                    <div class="feedback-pane-label">
+                        <i data-feather="edit-3" style="width:14px;height:14px;"></i>
+                        你的反馈 / 修改意见
+                    </div>
+                    <textarea id="fb-feedback-input" class="feedback-input" rows="8"
+                        placeholder="例如：&#10;- 第 3 段林尘的心理太软，他应该更狠一点&#10;- 第 5 段和前文矛盾了，前面说他没有修为&#10;- 节奏太慢，第 7 段可以再紧凑一些&#10;- 对话太文艺，不符合爽文风格"></textarea>
+                    <div class="feedback-tips">
+                        <strong>💡 反馈写得好，AI 改得准：</strong>
+                        <ul>
+                            <li>指出具体段号或原文片段（"第 X 段..." / "林尘说 XXX 这句..."）</li>
+                            <li>说清楚"问题 + 期望"（"太拖 / 期望更紧凑"）</li>
+                            <li>不要提"整体重写"——会破坏剧情骨架</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" data-close="1">取消</button>
+                <button id="fb-submit-btn" class="btn btn-primary">
+                    <i data-feather="zap"></i> AI 修订
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 章节前后对比模态框 -->
+    <div id="chapter-diff-modal" class="modal" style="display:none;">
+        <div class="modal-backdrop" data-close="1"></div>
+        <div class="modal-content modal-diff" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h3>
+                    <i data-feather="columns"></i>
+                    前后对比 · 第 <span id="diff-chapter-num">?</span> 章
+                </h3>
+                <div class="diff-stats" id="diff-stats"></div>
+                <button class="modal-close" data-close="1" aria-label="关闭">×</button>
+            </div>
+            <div class="modal-body modal-diff-body">
+                <div class="diff-pane">
+                    <div class="diff-pane-label diff-pane-new">
+                        <i data-feather="check-circle" style="width:14px;height:14px;"></i>
+                        修订后
+                        <span class="diff-pane-tag tag-add">新增</span>
+                    </div>
+                    <div id="diff-new-content" class="diff-content"></div>
+                </div>
+                <div class="diff-pane">
+                    <div class="diff-pane-label diff-pane-old">
+                        <i data-feather="archive" style="width:14px;height:14px;"></i>
+                        修订前
+                        <span class="diff-pane-tag tag-del">删除</span>
+                    </div>
+                    <div id="diff-old-content" class="diff-content"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="diff-discard-btn" class="btn btn-ghost">
+                    <i data-feather="x"></i> 放弃修改
+                </button>
+                <button id="diff-revise-again-btn" class="btn btn-secondary">
+                    <i data-feather="refresh-cw"></i> 再改一轮
+                </button>
+                <button id="diff-apply-btn" class="btn btn-primary">
+                    <i data-feather="check"></i> 采用新版
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 作品简介模态框（含合规检查） -->
+    <div id="synopsis-modal" class="modal" style="display:none;">
+        <div class="modal-backdrop" data-close="1"></div>
+        <div class="modal-content modal-synopsis" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h3>
+                    <i data-feather="book-open"></i>
+                    作品简介 · <span id="synopsis-novel-title">—</span>
+                </h3>
+                <button class="modal-close" data-close="1" aria-label="关闭">×</button>
+            </div>
+            <div class="modal-body modal-synopsis-body">
+                <div class="synopsis-toolbar">
+                    <button id="synopsis-generate" class="btn btn-primary btn-sm" title="AI 基于大纲自动生成简介">
+                        <i data-feather="zap"></i> AI 生成
+                    </button>
+                    <button id="synopsis-check" class="btn btn-sm" title="检查合规性（色情/暴力/政治/赌博/毒品/邪教/歧视/未成年等）">
+                        <i data-feather="shield"></i> 合规检查
+                    </button>
+                    <span id="synopsis-status" class="synopsis-status"></span>
+                </div>
+                <textarea id="synopsis-input" class="synopsis-input" rows="10"
+                    placeholder="作品简介（用于番茄小说等平台展示）。&#10;&#10;AI 生成：点击右上角"AI 生成"自动基于大纲写一段 50-200 字简介。&#10;&#10;要求：&#10;- 抓核心卖点（金手指/主线/爽点）&#10;- 不可含色情、暴力细节、政治、赌博、毒品、邪教、歧视&#10;- 不可含未成年人违规、营销引流、emoji&#10;- 长度建议 30-200 字"></textarea>
+                <div class="synopsis-counter">
+                    <span id="synopsis-char-count">0</span> 字 / 1000 字上限 · 番茄建议 30-200 字
+                </div>
+                <div id="synopsis-risks" class="synopsis-risks"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" data-close="1">取消</button>
+                <button id="synopsis-save" class="btn btn-primary">
+                    <i data-feather="save"></i> 保存简介
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 章节发布包模态框（格式检测 + 一键发布番茄） -->
+    <div id="publish-pack-modal" class="modal" style="display:none;">
+        <div class="modal-backdrop" data-close="1"></div>
+        <div class="modal-content modal-publish" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h3>
+                    <i data-feather="package"></i>
+                    发布包 · 第 <span id="pp-chapter-num">?</span> 章
+                </h3>
+                <button class="modal-close" data-close="1" aria-label="关闭">×</button>
+            </div>
+            <div class="modal-body modal-publish-body">
+                <div class="pp-section">
+                    <div class="pp-section-label">📋 章节元信息</div>
+                    <div id="pp-meta" class="pp-meta"></div>
+                </div>
+                <div class="pp-section">
+                    <div class="pp-section-label">⚠️ 风险检测 (<span id="pp-risk-count">0</span> 项)</div>
+                    <div id="pp-risks" class="pp-risks"></div>
+                </div>
+                <div class="pp-section">
+                    <div class="pp-section-label">📤 发布到番茄小说（半自动 playwright）</div>
+                    <div class="pp-publish-actions">
+                        <div class="pp-step">
+                            <strong>步骤 1：</strong> 启动浏览器
+                            <button id="pp-start-browser" class="btn btn-primary btn-sm">
+                                <i data-feather="play"></i> 启动浏览器
+                            </button>
+                            <span id="pp-session-id" class="pp-session-info"></span>
+                        </div>
+                        <div class="pp-step">
+                            <strong>步骤 2：</strong> 在浏览器里<strong>手动登录番茄作家后台</strong> → 进入"新增章节"页面
+                        </div>
+                        <div class="pp-step">
+                            <strong>步骤 3：</strong> 填入标题 + 正文
+                            <button id="pp-fill-chapter" class="btn btn-primary btn-sm" disabled>
+                                <i data-feather="edit"></i> 填入章节
+                            </button>
+                            <span id="pp-fill-result" class="pp-session-info"></span>
+                        </div>
+                        <div class="pp-step">
+                            <strong>步骤 4：</strong> 保存草稿
+                            <button id="pp-save-draft" class="btn btn-primary btn-sm" disabled>
+                                <i data-feather="save"></i> 尝试保存草稿
+                            </button>
+                            <span id="pp-save-result" class="pp-session-info"></span>
+                        </div>
+                        <div class="pp-step">
+                            <strong>步骤 5：</strong> 关闭浏览器
+                            <button id="pp-close-browser" class="btn btn-sm" disabled>
+                                <i data-feather="x"></i> 关闭会话
+                            </button>
+                        </div>
+                    </div>
+                    <div class="pp-tip">
+                        💡 番茄对自动化发布严格管控，本流程为<strong>半自动</strong>：你登录后，浏览器自动填入章节，你人工点"保存草稿"再发。
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="pp-copy-body" class="btn btn-ghost">
+                    <i data-feather="copy"></i> 复制全文
+                </button>
+                <button class="btn btn-ghost" data-close="1">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>
