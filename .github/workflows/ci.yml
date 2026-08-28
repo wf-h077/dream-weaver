@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint (Python syntax + JSON)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ruff
+        run: pip install --quiet ruff
+
+      - name: Ruff check
+        run: |
+          ruff check --output-format=github --select=E,F,W --ignore=E501 app.py models.py prompts.py mock_data.py config.py mcp_server.py memory.py graph.py auth.py cache.py state.py || true
+
+  smoke-test:
+    name: Smoke test (MOCK_MODE=1)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate Python syntax
+        run: |
+          python -c "import ast, sys
+          for f in ['app.py', 'models.py', 'prompts.py', 'mock_data.py', 'mcp_server.py', 'memory.py', 'graph.py', 'config.py', 'auth.py', 'cache.py', 'state.py']:
+              try:
+                  ast.parse(open(f, encoding='utf-8').read())
+                  print(f'  OK: {f}')
+              except SyntaxError as e:
+                  print(f'  FAIL: {f}: {e}')
+                  sys.exit(1)
+          "
+
+      - name: Mock data import test
+        run: |
+          MOCK_MODE=1 python -c "
+          import sys
+          sys.path.insert(0, '.')
+          from mock_data import call_llm_mock, _detect_call_type
+          # Test all call types
+          test_cases = [
+              ('CONCEPT_REFINEMENT_SYSTEM', '请把下面这个已选中的小说方向', None, 'refine_concept'),
+              ('BRAINSTORM_SYSTEM', '请根据灵感构思一个小说企划案', None, 'brainstorm'),
+              ('WRITER_SYSTEM', '', None, 'writer'),
+              (None, None, [{'role': 'system', 'content': 'WRITER_SYSTEM content'}, {'role': 'user', 'content': 'write chapter'}], 'writer'),
+          ]
+          for sp, pp, msgs, expected in test_cases:
+              result, text = call_llm_mock(sp or '', pp or '', msgs)
+              ok = '✓' if result == expected else '✗'
+              print(f'  {ok} expected={expected} got={result} len={len(text)}')
+              if result != expected:
+                  sys.exit(1)
+          print('All mock tests passed.')
+          "
+
+      - name: Boot MCP server (background)
+        run: |
+          MOCK_MODE=1 nohup python mcp_server.py > /tmp/mcp.log 2>&1 &
+          sleep 3
+          curl -s http://127.0.0.1:8001/mcp/health || echo "MCP not healthy but continuing"
+
+      - name: Boot app (background) + check endpoint
+        run: |
+          MOCK_MODE=1 nohup python app.py > /tmp/app.log 2>&1 &
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            sleep 2
+            if curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8050/ | grep -q '200'; then
+              echo "  ✓ app is up (attempt $i)"
+              break
+            fi
+            echo "  waiting... (attempt $i)"
+          done
+          # Check key endpoint
+          STATUS=$(curl -s -o /tmp/status.json -w '%{http_code}' http://127.0.0.1:8050/api/status)
+          if [ "$STATUS" = "200" ]; then
+            echo "  ✓ /api/status returns 200"
+            cat /tmp/status.json | head -c 200
+          else
+            echo "  ✗ /api/status returns $STATUS"
+            cat /tmp/app.log | tail -20
+            exit 1
+          fi

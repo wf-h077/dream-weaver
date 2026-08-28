@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/<your-org>/dream-weaver/discussions
+    about: General questions, ideas, and showcase — open a discussion instead.
+  - name: 📖 Documentation
+    url: https://github.com/<your-org>/dream-weaver/blob/main/README.md
+    about: For usage questions, check the README / USER_MANUAL / WRITING_CHECKLIST first.
