@@ -1,0 +1,41 @@
+# Dependabot configuration
+# Automated security / patch PRs for Python dependencies
+# Docs: https://docs.github.com/en/code-security/dependabot/dependabot-security-updates
+
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "UTC"
+    # Only PR patch + minor updates; majors need manual review
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "automated-pr"
+    # Group patch + minor updates so we get fewer PRs
+    groups:
+      patch-and-minor:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Don't auto-update major versions (those need manual review)
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "automated-pr"
+      - "ci"

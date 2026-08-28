@@ -210,6 +210,8 @@ dream-weaver/
 - **No upload of user content**: `novels/`, `story_bible.db` are in `.gitignore`
 - **API keys stay with you**: `.env` is git-ignored, you control your own config
 - **Optional cloud backup**: AWS S3 / Alibaba OSS / any S3-compatible storage
+- **Vulnerability disclosure**: see [SECURITY.md](SECURITY.md) — please report privately, not via public issues
+- **Change log**: see [CHANGELOG.md](CHANGELOG.md) for version-by-version release notes
 
 ---
 
