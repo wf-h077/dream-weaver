@@ -32,6 +32,7 @@ __pycache__/
 *.pyo
 *.pyd
 .python-version
+static/docs/gif_frames/
 .venv/
 venv/
 env/
@@ -78,6 +79,6 @@ build/
 # ===== 静态资源 =====
 static/app.js.map
 
-# ===== ���ݳ־û��ļ� =====
+# ===== ���ݳ־û��ļ� =====
 data/*.json
 static/*.map

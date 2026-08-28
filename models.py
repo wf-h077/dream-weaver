@@ -26,6 +26,11 @@ CURRENT_NOVEL_ID: contextvars.ContextVar[str] = contextvars.ContextVar(
     "current_novel_id", default=""
 )
 
+# ── MOCK 模式：跳过真实 LLM 调用，返回预设数据 ──
+# 用法：在 .env 设 MOCK_MODE=1，重启服务即可。所有 call_llm() 会从 mock_data.py 返回内容，
+# 让 GitHub 访客无需配置 LLM key 也能完整体验 UI 流程。
+MOCK_MODE = os.getenv("MOCK_MODE", "").lower() in {"1", "true", "yes", "on"}
+
 from openai import OpenAI
 
 from config import (
@@ -389,6 +394,37 @@ def call_llm(
         默认返回 str（content），便于现有大量调用方无改动。
         return_structured=True 时返回 LLMResponse dataclass。
     """
+    # ── MOCK 模式：跳过真实 LLM 调用，返回预设数据 ──
+    if MOCK_MODE:
+        try:
+            from mock_data import call_llm_mock
+            call_type, mock_text = call_llm_mock(system_prompt or "", prompt or "", messages)
+            # 记录到 usage 跟踪器（mock 标记）
+            mock_record = UsageRecord(
+                role=role,
+                model=f"[MOCK] {call_type}",
+                provider="mock",
+                prompt_tokens=len(prompt or "") // 2,
+                completion_tokens=len(mock_text) // 2,
+                total_tokens=(len(prompt or "") + len(mock_text)) // 2,
+                duration_seconds=0.1,
+                success=True,
+            )
+            USAGE.add(mock_record)
+            if return_structured:
+                return LLMResponse(
+                    content=mock_text,
+                    role=role,
+                    model=f"[MOCK] {call_type}",
+                    provider="mock",
+                    duration_seconds=0.1,
+                    usage={"prompt_tokens": mock_record.prompt_tokens, "completion_tokens": mock_record.completion_tokens, "total_tokens": mock_record.total_tokens},
+                )
+            return mock_text
+        except Exception as e:
+            print(f"  ⚠️ MOCK 模式异常: {e}，回退到真实调用")
+            # 失败则继续走真实调用路径
+
     max_retries = 10
     retry_delay = 30
 

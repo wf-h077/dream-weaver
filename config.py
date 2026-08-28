@@ -20,6 +20,10 @@ MINIMAX_THINKING_DISABLED = os.getenv("MINIMAX_THINKING_DISABLED", "true").lower
     "1", "true", "yes", "on",
 }
 
+# ── MOCK 模式：跳过真实 LLM 调用，所有 AI 端点返回预设数据 ──
+# 设为 1 时，无需配置任何 API key 即可完整体验 UI（适合 GitHub 访客快速试用）
+MOCK_MODE = os.getenv("MOCK_MODE", "").lower() in {"1", "true", "yes", "on"}
+
 # ── 旧字段，向后兼容（直接被 models.py / 其它模块 import）──
 API_KEY = LOCAL_API_KEY
 BASE_URL = LOCAL_BASE_URL

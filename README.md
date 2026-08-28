@@ -1,221 +1,238 @@
-# 🌙 造梦者 (Dream Weaver) | AI 长篇网文创作平台
+# 🌙 Dream Weaver (造梦者) | AI Long-Form Web Novel Platform
 
-[![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Framework](https://img.shields.io/badge/Framework-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
-[![Multi--Agent](https://img.shields.io/badge/Architecture-Multi--Agent-orange.svg)](#)
+[![Multi-Agent](https://img.shields.io/badge/Architecture-Multi--Agent-orange.svg)](#)
+[![Mock Mode](https://img.shields.io/badge/Mock_Mode-✅_no_API_key_needed-brightgreen.svg)](#-try-it-without-an-llm)
 
-> 一句话：**为长篇网文作者设计的"AI 副驾"**——从灵感立项到连载百章，从单章生成到全书一致性，从 AI 写稿到读者反馈修订，全流程覆盖。
+> **An AI co-pilot built for long-form web novel authors.** From a one-line idea to 100+ chapters of consistent serialized fiction. Handles worldbuilding, character continuity, feedback-driven revision, and version rollback — so AI-written chapters don't drift off-rails after chapter 30.
 
-造梦者是一个**多 Agent 协同的网文创作系统**。它不仅能写单章，还能管理 100+ 章的长篇连载，自动维护大纲、人物卡、势力卡、世界规则、伏笔库——保证 AI 写出来的内容"前后对得上、人物不崩、设定一致"。
+![Demo](static/docs/demo.gif)
+
+[中文文档 (Chinese)](README.zh-CN.md) · [User Manual](USER_MANUAL.md) · [Writing Checklist](WRITING_CHECKLIST.md)
 
 ---
 
-## ✨ 它能做什么
+## ✨ What it does
 
-### 🎯 全流程覆盖
+### 🎯 End-to-end workflow
 
 ```
-灵感 → 立项方向 → 深度细化 → 全书章节蓝图 → 第 1 章 → 自动续写 → 反馈修订 → ...
-       ↓                ↓              ↓                ↓
-   3 个方向选择   100 章约束清单   100 章目标     自动按约束写
-                   + 角色/势力     + 升级节奏
+Idea → 3 directions → Detailed concept → Full chapter blueprint → Chapter 1 → Auto-continue → Reader feedback → Revision → ...
+       ↓                  ↓                     ↓                       ↓                ↓
+   Pick one          100 chapter            100 chapter            Auto-write         Apply
+                    constraints list      targets + pacing       with constraints   feedback
+                    + characters/factions + upgrade arc
 ```
 
-### 🛠️ 核心能力
+### 🛠️ Core capabilities
 
-| 能力 | 说明 |
+| Capability | Description |
 |---|---|
-| **🧠 多 Agent 协同** | planner（策划）/ writer（写作）/ editor（编辑）/ patcher（修补）/ reviewer（复盘）各司其职 |
-| **📚 分层记忆（MCP）** | 独立的 `mcp_server.py` + SQLite，结构化存储 lore / 角色 / 伏笔 / 章节版本 |
-| **🔍 跨章检索** | 写每章时自动从全书检索相关 lore/设定/前情，避免跑题 |
-| **✂️ 智能修补** | 局部风险修复 + 整章反馈修订 + 一键回滚到任意历史版本 |
-| **🎭 动态技能** | 内置 combat / emotion / dialogue 等专门技能，按需调度 |
-| **💡 长篇陪跑工具** | 章节类型检测 / 大纲覆盖度 / 反 AI 味检测 / 角色一致性 / 伏笔追踪 |
-| **📊 仪表盘** | 字数 / 成本 / 角色 / 仪表 / 类型分布 / 一致性扫描 实时展示 |
-| **⏪ 版本回滚** | 每次保存/修订都自动留版本，一键恢复到任意历史版本（防误删） |
-| **🌐 双 Provider** | 本地 GPUStack（Qwen 系列）+ 云端 MiniMax M3（512k 长上下文） |
+| **🧠 Multi-Agent** | `planner` / `writer` / `editor` / `patcher` / `reviewer` — each with its own prompt template, model role, and validation logic |
+| **📚 Layered memory (MCP)** | Separate `mcp_server.py` + SQLite, structured storage for lore / characters / foreshadowing / chapter versions |
+| **🔍 Cross-chapter retrieval** | When writing each chapter, auto-fetch relevant lore/settings/previous chapters to avoid drift |
+| **✂️ Intelligent patching** | Localized risk fixes + full-chapter feedback revision + one-click rollback to any historical version |
+| **🎭 Dynamic skills** | Built-in combat / emotion / dialogue specialist skills, dispatched based on chapter type |
+| **💡 Long-form companion tools** | Chapter type detection / blueprint coverage / anti-AI-flavor check / character consistency / foreshadowing tracker |
+| **📊 Real-time dashboard** | Word count / token cost / character usage / time / type distribution / consistency scan — all live |
+| **⏪ Version rollback** | Every save/revision auto-saves a version; restore any past version with one click |
+| **🌐 Dual provider** | Local GPUStack (Qwen3.5) + cloud MiniMax M3 (512K context for long chapters) |
+| **🧪 Mock mode** | Try the entire UI with preset data — **no LLM key required** |
 
-### 🎨 写作流程
+### 🎨 Writing pipeline
 
-1. **立项**：3 个自动生成的方向选择
-2. **细化**：填章节数目 → AI 生成 100 章约束清单 + 角色/势力/规则
-3. **蓝图**：全书章节蓝图 → AI 自动拆解 N 章
-4. **开始写**：第 1 章 AI 自动生成（含大纲 + 角色状态 + 前情）
-5. **续写**：第 2/3/... 章自动按约束清单写
-6. **反馈修订**：写完后读者给反馈，AI 按反馈局部修订
-7. **修补**：检测到风险时 AI 自动修补
-8. **复盘**：写完 30/50/100 章后做类型分布 / 一致性扫描
+1. **Pitch**: AI generates 3 distinct story directions from a one-line seed
+2. **Concept**: Pick one → specify chapter count (e.g. 100) → AI generates a 100-entry constraint list (purpose, core event, required characters, ending hook) + character/faction/world-rule cards
+3. **Blueprint**: Auto-splits the constraint list into a 100-chapter roadmap with 5-act pacing
+4. **Chapter 1**: AI writes the full chapter (2,000-3,000 chars) using blueprint + character state + previous context
+5. **Continue**: Chapter 2/3/... each auto-writes using its own constraint + cross-chapter memory retrieval
+6. **Feedback revision**: Reader gives feedback → AI applies targeted edits (preserves good parts)
+7. **Auto-patch**: Detected risks → AI replaces minimal text fragments
+8. **Long-form review**: At chapter 30/50/100 → run type distribution / consistency / anti-AI-flavor scan
 
 ---
 
-## 🚀 快速开始
+## 🚀 Quick start
 
-### 前置要求
-
-- Python 3.10+
-- 一个 AI Provider：
-  - **本地 GPUStack**（推荐）：[gpustack/gpustack](https://github.com/gpustack/gpustack) + Qwen3.5-9B/27B 模型
-  - **或云端 MiniMax M3**：[MiniMax 开放平台](https://api.minimaxi.com) 注册获取 API key
-
-### 安装
+### Try it without an LLM (Mock mode — recommended for first-time visitors)
 
 ```bash
-# 1. 克隆仓库
 git clone https://github.com/<your-org>/dream-weaver.git
 cd dream-weaver
-
-# 2. 安装依赖
 pip install -r requirements.txt
-
-# 3. 复制环境变量
 cp .env.example .env
-# 编辑 .env 填入真实 API key
+
+# Enable mock mode (no API key needed)
+echo "MOCK_MODE=1" >> .env
+
+# Start (two processes)
+python mcp_server.py    # port 8001
+python app.py          # port 8050
 ```
 
-### 启动
+Open [http://localhost:8050](http://localhost:8050) → register an account → click **创作** → enter a seed → experience the full flow with preset mock data.
 
-```bash
-# 启动顺序：先 mcp_server（数据层），再 app（API + 前端）
-python mcp_server.py    # 端口 8001
-python app.py          # 端口 8050
-```
+Mock mode answers every LLM call with realistic Chinese web-novel prose (see `mock_data.py`). You can:
+- Walk through the entire UI (brainstorm → concept refinement → init → chapter generation → reflection → version rollback)
+- Read preset chapters and see the dashboard, version history, and feedback flow
+- All **without configuring an API key or burning any tokens**
 
-打开浏览器：[http://localhost:8050](http://localhost:8050)
+### Real mode (with your own LLM)
 
-### 第一次使用
+1. **Get an API key** (pick one):
+   - **Local GPUStack** (free, recommended): [gpustack/gpustack](https://github.com/gpustack/gpustack) + Qwen3.5-9B/27B models
+   - **Cloud MiniMax M3** (best for long chapters): [MiniMax Open Platform](https://api.minimaxi.com) — get an API key
+   - Any other OpenAI-compatible endpoint
 
-1. 注册账号（首个账号自动是 admin）
-2. 点"创作"标签 → 写一句话灵感 → 自动生成 3 个立项方向
-3. 选 1 个方向 → 深度细化（**填章节数目**，如 100）→ AI 生成全章约束
-4. 点"保存并生成全书章节蓝图"
-5. 点"自动生成下一章"
+2. **Configure** `.env`:
+   ```ini
+   MOCK_MODE=0
+   API_KEY=your_local_gpustack_key
+   BASE_URL=http://localhost:8000/v1
+   MINIMAX_API_KEY=your_minimax_key
+   MINIMAX_BASE_URL=https://api.minimaxi.com/v1
+   ```
 
-> 详细的"避坑清单"请看 [WRITING_CHECKLIST.md](WRITING_CHECKLIST.md)
+3. **Start**:
+   ```bash
+   python mcp_server.py    # port 8001 (data layer)
+   python app.py          # port 8050 (API + frontend)
+   ```
+
+4. **First-time use**:
+   1. Register an account (first user becomes admin)
+   2. Click **创作** tab → write a one-line seed → AI generates 3 directions
+   3. Pick one → fill in chapter count (e.g. 100) → AI generates full chapter constraints
+   4. Click **启航创世** (Launch) → AI writes Chapter 1 (~2 min)
+   5. Click **生成下一章** (Generate next) → auto-writes Chapter 2/3/...
+
+> See [WRITING_CHECKLIST.md](WRITING_CHECKLIST.md) for common pitfalls and best practices.
 
 ---
 
-## 🏗️ 项目结构
+## 🏗️ Architecture
 
 ```
 dream-weaver/
-├── app.py              # 🌐 FastAPI 主服务（端口 8050）
-├── mcp_server.py       # 💾 MCP 数据服务（端口 8001）
-├── memory.py           # 📚 StoryBible 封装
-├── graph.py            # 🔀 LangGraph 工作流
-├── models.py           # 🤖 多 provider LLM 调用
-├── prompts.py          # 💬 所有 prompt 模板
-├── state.py            # 📊 全局状态类型
-├── config.py           # ⚙️ 配置加载
-├── auth.py             # 🔐 鉴权
-├── cache.py            # ⚡ TTL 缓存（P0-2 优化）
+├── app.py              # 🌐 FastAPI main service (port 8050)
+├── mcp_server.py       # 💾 MCP data service (port 8001)
+├── memory.py           # 📚 StoryBible wrapper (characters, lore, foreshadowing)
+├── graph.py            # 🔀 LangGraph workflow (recall → plan → write → review)
+├── models.py           # 🤖 Multi-provider LLM call (local + cloud)
+├── mock_data.py        # 🧪 Mock mode preset responses (for MOCK_MODE=1)
+├── prompts.py          # 💬 All prompt templates (30+ system prompts)
+├── state.py            # 📊 Global state types
+├── config.py           # ⚙️ Configuration
+├── auth.py             # 🔐 Authentication
+├── cache.py            # ⚡ TTL cache (P0-2 optimization)
 │
-├── agents/             # 🤖 5 个 Agent
-│   ├── planner.py      # 策划：立项、细化、章节蓝图
-│   ├── writer.py       # 写作：写章节
-│   ├── editor.py       # 编辑：风险检测、整章反馈修订
-│   ├── patcher.py      # 修补：局部风险修补
-│   └── reviewer.py     # 复盘：长篇陪跑工具
+├── agents/             # 🤖 5 specialized agents
+│   ├── planner.py      # Pitch, concept refinement, chapter blueprint
+│   ├── writer.py       # Write full chapters
+│   ├── editor.py       # Risk detection, full-chapter revision
+│   ├── patcher.py      # Localized risk patches
+│   └── reviewer.py     # Long-form companion tools
 │
-├── tools/              # 🛠️ Agent 自助工具
-│   ├── search.py       # 跨章检索
-│   ├── extract.py      # 实体抽取
+├── tools/              # 🛠️ Agent self-service tools
+│   ├── search_lore.py  # Cross-chapter memory retrieval
+│   ├── read_chapter.py # Read past chapters
 │   └── ...
 │
-├── skills/             # 🎭 动态技能
-│   ├── combat.json
-│   ├── emotion.json
-│   └── dialogue.json
+├── skills/             # 🎭 Dynamic skills (combat, emotion, dialogue)
 │
-├── static/             # 🎨 前端
+├── static/             # 🎨 Frontend (vanilla HTML/CSS/JS, no framework)
 │   ├── index.html
-│   ├── app.js          # 主逻辑（minify 后 ~220KB）
-│   └── style.css       # 暗色主题 + 移动端适配
+│   ├── app.js          # ~220KB minified (~50KB gzipped)
+│   ├── style.css       # Dark theme + mobile responsive
+│   └── docs/
+│       ├── demo.gif            # 30s demo
+│       └── screenshots/        # 12 high-res UI shots
 │
-├── prompts_style_presets.py  # 8 大网文风格预设（番茄/起点等）
-├── publish_uploader.py       # 番茄小说发布
-├── backup.py                  # 数据库备份
-├── cloud_backup.py            # 云端备份（S3/OSS）
+├── prompts_style_presets.py  # 8 web-novel style presets (番茄/起点/etc.)
+├── publish_uploader.py       # Tomato Novel platform publisher
+├── backup.py                  # Database backup
+├── cloud_backup.py            # S3/OSS cloud backup
 │
-├── README.md
-├── USER_MANUAL.md            # 详细用户操作手册
-├── WRITING_CHECKLIST.md      # 写作避坑清单
-├── E2E_TEST.md                # 端到端测试文档
-├── .env.example               # 环境变量示例
-└── LICENSE                    # MIT
+├── README.md               # ← You are here
+├── README.zh-CN.md         # Chinese version
+├── USER_MANUAL.md          # Detailed usage manual
+├── WRITING_CHECKLIST.md    # Writing best practices
+├── E2E_TEST.md              # End-to-end testing guide
+├── .env.example             # Environment template
+└── LICENSE                  # MIT
 ```
 
----
+### Tech stack
 
-## 🧬 技术栈
-
-| 层 | 技术 |
+| Layer | Tech |
 |---|---|
-| 后端 | FastAPI + SQLite + MCP |
-| Agent | 自研多 Agent（不用 LangGraph/LangChain） |
-| 缓存 | Python 自研 TTL 缓存（无 Redis 依赖） |
-| 前端 | 原生 HTML/CSS/JS（无 React/Vue 依赖） |
-| AI | Qwen3.5 / MiniMax M3 等 OpenAI 兼容 API |
-| 存储 | SQLite + 文件系统（章节 .txt） |
+| Backend | FastAPI + SQLite + MCP (Model Context Protocol) |
+| Agent framework | Custom multi-agent (LangGraph-inspired, but standalone) |
+| Cache | In-process TTL cache (no Redis dependency) |
+| Frontend | Vanilla HTML/CSS/JS (no React/Vue — keeps the bundle small) |
+| AI | Qwen3.5 / MiniMax M3 (any OpenAI-compatible API) |
+| Storage | SQLite (metadata) + filesystem (chapters as .txt files) |
 
 ---
 
-## 🎯 适用人群
+## 🎯 Who is this for
 
-- **长篇网文作者**：想用 AI 加速但又怕质量跑偏
-- **工作室 / 编辑**：管理多个连载项目，需要标准化流程
-- **AI 应用开发者**：参考多 Agent 系统的实现
-- **网文运营**：番茄 / 起点 / 七猫 等平台的 AI 辅助写手
-
----
-
-## 📊 性能优化（P0-P2）
-
-- **P0 1**：批量字数 API（`/api/novels/{id}/chapters/stats`）— 1 次请求替代 50 次并发 fetch，**加速 49×**
-- **P0 2**：内存 TTL 缓存（status 3s / novels 10s / stats 15s）— 命中率 50%
-- **P1 1**：前端 esbuild minify + GZip 压缩 — 218KB / 50KB
-- **P1 2**：SQLite 复合索引（5 个 novel_id 索引）— pending_extractions（3874 行）查询从全表扫描降至 3.9ms
-- **P2**：骨架屏 + 乐观更新（归档/删除立即响应）
+- **Long-form web novel authors** who want AI assistance without quality drift after 30+ chapters
+- **Studio managers / editors** who oversee multiple serialized projects
+- **AI application developers** looking for a reference multi-agent implementation
+- **Web novel operators** on platforms like 番茄/起点/七猫
 
 ---
 
-## 📚 文档
+## 📊 Performance optimizations (P0-P2)
 
-- [USER_MANUAL.md](USER_MANUAL.md) — 详细功能操作手册
-- [WRITING_CHECKLIST.md](WRITING_CHECKLIST.md) — 写作避坑清单（必读）
-- [E2E_TEST.md](E2E_TEST.md) — 端到端测试文档
-
----
-
-## 🛡️ 隐私与安全
-
-- **本地优先**：所有数据（章节、用户、版本历史）默认存本地 SQLite + 文件系统
-- **不上传用户作品**：`novels/`、`story_bible.db` 已在 `.gitignore` 排除
-- **API key 由你掌控**：`.env` 文件不上传，配置由你自己管理
-- **可选云端备份**：AWS S3 / 阿里云 OSS / 任意兼容 S3 协议存储
+- **P0-1**: Batched word-count API (`/api/novels/{id}/chapters/stats`) — 1 request replaces 50 concurrent fetches, **49× speedup**
+- **P0-2**: In-memory TTL cache (status 3s / novels 10s / stats 15s) — 50% hit rate
+- **P1-1**: Frontend esbuild minify + GZip — 218KB → 50KB gzipped
+- **P1-2**: SQLite composite indexes (5 `novel_id` indexes) — `pending_extractions` (3,874 rows) query: full table scan → 3.9ms
+- **P2**: Skeleton screens + optimistic updates (archive/delete responds instantly)
 
 ---
 
-## 🤝 贡献
+## 📚 Documentation
 
-欢迎 PR、Issue、Discussion。具体可看 [WRITING_CHECKLIST.md](WRITING_CHECKLIST.md) 了解项目痛点。
+- **[USER_MANUAL.md](USER_MANUAL.md)** — Detailed usage manual (Chinese; covers every UI feature)
+- **[WRITING_CHECKLIST.md](WRITING_CHECKLIST.md)** — Writing best practices (Chinese; 13 pitfalls to avoid)
+- **[E2E_TEST.md](E2E_TEST.md)** — End-to-end testing guide (Chinese)
+
+---
+
+## 🛡️ Privacy & security
+
+- **Local-first**: All data (chapters, users, version history) stored in local SQLite + filesystem by default
+- **No upload of user content**: `novels/`, `story_bible.db` are in `.gitignore`
+- **API keys stay with you**: `.env` is git-ignored, you control your own config
+- **Optional cloud backup**: AWS S3 / Alibaba OSS / any S3-compatible storage
+
+---
+
+## 🤝 Contributing
+
+Issues, PRs, and Discussions are welcome. See [WRITING_CHECKLIST.md](WRITING_CHECKLIST.md) to understand the project's pain points.
 
 ---
 
 ## 📜 License
 
-[MIT](LICENSE) — 你可以自由使用、修改、商用，但保留版权声明。
+[MIT](LICENSE) — Free to use, modify, and commercialize, with copyright notice preserved.
 
 ---
 
-## 🌟 致谢
+## 🌟 Acknowledgments
 
-- 感谢 [LangGraph](https://github.com/langchain-ai/langgraph) 启发的多 Agent 设计思路
-- 感谢 [GPUStack](https://github.com/gpustack/gpustack) 让本地 GPU 推理变得简单
-- 感谢所有网文作者——是你们的内容让 AI 有了学习方向
+- Inspired by [LangGraph](https://github.com/langchain-ai/langgraph)'s multi-agent design ideas
+- Thanks to [GPUStack](https://github.com/gpustack/gpustack) for making local GPU inference simple
+- Thanks to all web novel authors — your work gives AI something to learn from
 
 ---
 
 <p align="center">
-  <b>造梦者 v1.0</b> · 让 AI 写完一整本小说不再是梦
+  <b>Dream Weaver v1.0</b> · Let AI finish a whole novel
 </p>
