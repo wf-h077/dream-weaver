@@ -238,3 +238,9 @@ Issues, PRs, and Discussions are welcome. See [WRITING_CHECKLIST.md](WRITING_CHE
 <p align="center">
   <b>Dream Weaver v1.0</b> · Let AI finish a whole novel
 </p>
+
+## ⭐ Star History
+
+If Dream Weaver helps your writing workflow, consider giving it a star — it helps others discover the project.
+
+[![Star History Chart](https://api.star-history.com/svg?repos=wf-h077/dream-weaver&type=Date)](https://star-history.com/#wf-h077/dream-weaver&Date)
