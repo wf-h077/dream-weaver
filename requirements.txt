@@ -1,6 +1,6 @@
 # 造梦者 (Dream Weaver) 依赖
 # 核心依赖
-fastapi>=0.110.0
+fastapi>=0.141.1
 uvicorn[standard]>=0.27.0
 pydantic>=2.6.0
 python-dotenv>=1.0.0
